@@ -1,7 +1,10 @@
 {
   "name": "lumina-monorepo",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
@@ -9,9 +12,10 @@
     "type-check": "turbo type-check"
   },
   "devDependencies": {
-    "turbo": "^2.0.0",
-    "typescript": "^5.4.0",
     "@types/node": "^20.0.0",
-    "eslint": "^8.57.0"
-  }
+    "eslint": "^8.57.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
+  },
+  "packageManager": "yarn@1.22.19"
 }
