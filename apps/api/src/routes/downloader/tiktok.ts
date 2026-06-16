@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { fetchJson } from '@lumina/utils'
-import type { ApiResponse, DownloadResult } from '@lumina/types'
+import { fetchJson } from '../../lib/utils'
+import type { ApiResponse, DownloadResult } from '../../lib/types'
 
 export const meta = {
   name: 'TikTok Downloader', desc: 'Download video TikTok tanpa watermark.',

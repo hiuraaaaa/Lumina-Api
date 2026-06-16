@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { postJson } from '@lumina/utils'
-import type { ApiResponse, ChatResponse } from '@lumina/types'
+import { postJson } from '../../lib/utils'
+import type { ApiResponse, ChatResponse } from '../../lib/types'
 import crypto from 'crypto'
 
 export const meta = {

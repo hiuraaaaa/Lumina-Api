@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { fetchJson } from '@lumina/utils'
+import { fetchJson } from '../../lib/utils'
 
 export const meta = {
   name: 'Anime Schedule', desc: 'Jadwal tayang anime berdasarkan hari.',

@@ -3,7 +3,7 @@
 //  Tambah route baru cukup import + daftarin di sini
 // ══════════════════════════════════════════
 import { Hono } from 'hono'
-import type { EndpointDoc } from '@lumina/types'
+import type { EndpointDoc } from '../lib/types'
 
 // AI Chat
 import luminaRoute, { meta as luminaMeta }     from './ai-chat/lumina.js'

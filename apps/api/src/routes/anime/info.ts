@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { fetchJson } from '@lumina/utils'
-import type { ApiResponse, AnimeResult } from '@lumina/types'
+import { fetchJson } from '../../lib/utils'
+import type { ApiResponse, AnimeResult } from '../../lib/types'
 
 export const meta = {
   name: 'Anime Info',

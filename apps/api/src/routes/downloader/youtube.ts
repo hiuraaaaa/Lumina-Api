@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { postJson } from '@lumina/utils'
-import type { ApiResponse, DownloadResult } from '@lumina/types'
+import { postJson } from '../../lib/utils'
+import type { ApiResponse, DownloadResult } from '../../lib/types'
 
 export const meta = {
   name: 'YouTube Downloader', desc: 'Download video/audio dari YouTube.',
