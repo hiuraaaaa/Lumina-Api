@@ -9,7 +9,7 @@
   --bg2:     #0f0f16;
   --surface: #13131c;
   --border:  rgba(255,255,255,0.07);
-  --accent:  #e8643a;
+  --accent:  #a78bfa;
   --a2:      #7c5cfc;
   --a3:      #3ae8c8;
   --text:    #f0eeea;
@@ -52,7 +52,7 @@ body::before {
 }
 .cur-ring {
   position: fixed; width: 34px; height: 34px;
-  border: 1px solid rgba(232,100,58,.45); border-radius: 50%;
+  border: 1px solid rgba(167,139,250,.45); border-radius: 50%;
   pointer-events: none; z-index: 9998;
   transform: translate(-50%,-50%);
   transition: width .2s, height .2s;
@@ -167,7 +167,7 @@ body::before {
   mask-image: radial-gradient(ellipse 80% 65% at 50% 50%, black, transparent);
 }
 .orb { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
-.o1 { width: min(550px, 80vw); height: min(550px, 80vw); background: radial-gradient(circle, rgba(232,100,58,.16), transparent 70%); top: -100px; right: -80px; animation: f1 9s ease-in-out infinite; }
+.o1 { width: min(550px, 80vw); height: min(550px, 80vw); background: radial-gradient(circle, rgba(167,139,250,.16), transparent 70%); top: -100px; right: -80px; animation: f1 9s ease-in-out infinite; }
 .o2 { width: min(380px, 60vw); height: min(380px, 60vw); background: radial-gradient(circle, rgba(124,92,252,.13), transparent 70%); bottom: 80px; left: -60px; animation: f2 11s ease-in-out infinite; }
 .o3 { width: min(280px, 50vw); height: min(280px, 50vw); background: radial-gradient(circle, rgba(58,232,200,.08), transparent 70%); top: 40%; left: 55%; animation: f2 13s ease-in-out infinite reverse; }
 @keyframes f1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-35px,28px) scale(1.04)} }
@@ -375,7 +375,7 @@ body::before {
 }
 .cat-card::after {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(232,100,58,.08), transparent 60%);
+  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(167,139,250,.08), transparent 60%);
   opacity: 0; transition: opacity .3s;
 }
 .cat-card:hover { background: var(--surface); }
