@@ -8,6 +8,8 @@ import type { EndpointDoc } from '../lib/types'
 // AI Chat
 import luminaRoute, { meta as luminaMeta }     from './ai-chat/lumina.js'
 import deepseekRoute, { meta as deepseekMeta } from './ai-chat/deepseek.js'
+import qwen3Route, { meta as qwen3Meta }       from './ai-chat/qwen3.js'
+
 
 // Downloader
 import tiktokRoute, { meta as tiktokMeta }   from './downloader/tiktok.js'
@@ -25,6 +27,7 @@ import animeInfoRoute,   { meta as animeInfoMeta }   from './anime/info.js'
 const ROUTES = [
   { path: '/ai-chat/lumina',       app: luminaRoute,      meta: luminaMeta },
   { path: '/ai-chat/deepseek',     app: deepseekRoute,    meta: deepseekMeta },
+  { path: '/ai-chat/qwen3',        app: qwen3Route,       meta: qwen3Meta }, 
   { path: '/downloader/tiktok',    app: tiktokRoute,      meta: tiktokMeta },
   { path: '/downloader/youtube',   app: youtubeRoute,     meta: youtubeMeta },
   { path: '/tools/ssweb',          app: sswebRoute,       meta: sswebMeta },
