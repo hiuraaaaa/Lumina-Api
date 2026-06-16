@@ -22,7 +22,7 @@ const app = new Hono()
 
 // Global middleware
 app.use('*', cors({ origin: '*' }))
-app.use('*', prettyJSON())
+app.use('*', prettyJSON({ space: 2, force: true }))
 app.use('/api/*', blacklistMiddleware)
 app.use('/api/*', rateLimitMiddleware)
 app.use('/api/*', authMiddleware)
