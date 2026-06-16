@@ -9,6 +9,7 @@ import { loggerMiddleware } from './middleware/logger'
 
 import aiLumina,      { meta as metaLumina }    from './routes/ai-chat/lumina'
 import aiDeepseek,    { meta as metaDeepseek }  from './routes/ai-chat/deepseek'
+import aiQwen3,       { meta as metaQwen3 }     from './routes/ai-chat/qwen3'
 import dlTiktok,      { meta as metaTiktok }    from './routes/downloader/tiktok'
 import dlYoutube,     { meta as metaYoutube }   from './routes/downloader/youtube'
 import toolsSsweb,    { meta as metaSsweb }     from './routes/tools/ssweb'
@@ -29,6 +30,7 @@ app.use('/api/*', loggerMiddleware)
 // Routes
 app.route('/api/ai-chat/lumina',    aiLumina)
 app.route('/api/ai-chat/deepseek',  aiDeepseek)
+app.route('/api/ai-chat/qwen3',     aiQwen3)
 app.route('/api/downloader/tiktok', dlTiktok)
 app.route('/api/downloader/youtube',dlYoutube)
 app.route('/api/tools/ssweb',       toolsSsweb)
@@ -40,6 +42,7 @@ app.route('/api/anime/schedule',    animeSchedule)
 const ALL_META = [
   { path: '/api/ai-chat/lumina',     ...metaLumina },
   { path: '/api/ai-chat/deepseek',   ...metaDeepseek },
+  { path: '/api/ai-chat/qwen3',      ...metaQwen3 },
   { path: '/api/downloader/tiktok',  ...metaTiktok },
   { path: '/api/downloader/youtube', ...metaYoutube },
   { path: '/api/tools/ssweb',        ...metaSsweb },
