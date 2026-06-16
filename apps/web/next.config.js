@@ -1,7 +1,6 @@
-import type { NextConfig } from 'next'
-
-const nextConfig: NextConfig = {
-  transpilePackages: ['@lumina/types'],
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  transpilePackages: [],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' }
@@ -9,4 +8,4 @@ const nextConfig: NextConfig = {
   }
 }
 
-export default nextConfig
+module.exports = nextConfig
