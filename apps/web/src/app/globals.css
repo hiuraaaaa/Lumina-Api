@@ -15,7 +15,11 @@
     --muted:   #6b6875;
   }
 
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    /* prevent horizontal overflow globally */
+    overflow-x: hidden;
+  }
 
   ::selection { background: #e8643a; color: #0a0a0f; }
 
@@ -26,7 +30,9 @@
   body {
     background: var(--bg);
     color: var(--text);
+    /* prevent horizontal scroll on all viewports */
     overflow-x: hidden;
+    max-width: 100vw;
   }
 
   /* noise overlay */
@@ -69,7 +75,7 @@
   .surface { background: var(--surface); border: 1px solid var(--border); }
 }
 
-/* ── custom cursor ── */
+/* ── custom cursor — hide on touch devices ── */
 .cur {
   position: fixed; width: 10px; height: 10px;
   background: var(--accent); border-radius: 50%;
@@ -77,6 +83,7 @@
   transform: translate(-50%,-50%);
   mix-blend-mode: difference;
   transition: width .15s, height .15s;
+  display: none; /* hidden by default, shown on fine pointer */
 }
 .cur-ring {
   position: fixed; width: 34px; height: 34px;
@@ -84,9 +91,10 @@
   pointer-events: none; z-index: 9998;
   transform: translate(-50%,-50%);
   transition: width .2s, height .2s;
+  display: none;
 }
-@media (max-width: 600px) {
-  .cur, .cur-ring { display: none; }
+@media (pointer: fine) {
+  .cur, .cur-ring { display: block; }
 }
 
 /* ── scroll progress ── */
@@ -104,24 +112,25 @@
     linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
   background-size: 72px 72px;
   mask-image: radial-gradient(ellipse 80% 65% at 50% 50%, black, transparent);
+  pointer-events: none;
 }
 
-/* ── orbs ── */
+/* ── orbs — clamp size so they don't blow out on mobile ── */
 .orb { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
 .o1 {
-  width: 550px; height: 550px;
+  width: min(550px, 90vw); height: min(550px, 90vw);
   background: radial-gradient(circle, rgba(232,100,58,.16), transparent 70%);
   top: -180px; right: -80px;
   animation: f1 9s ease-in-out infinite;
 }
 .o2 {
-  width: 380px; height: 380px;
+  width: min(380px, 70vw); height: min(380px, 70vw);
   background: radial-gradient(circle, rgba(124,92,252,.13), transparent 70%);
   bottom: 80px; left: -60px;
   animation: f2 11s ease-in-out infinite;
 }
 .o3 {
-  width: 280px; height: 280px;
+  width: min(280px, 60vw); height: min(280px, 60vw);
   background: radial-gradient(circle, rgba(58,232,200,.08), transparent 70%);
   top: 40%; left: 55%;
   animation: f2 13s ease-in-out infinite reverse;
@@ -172,8 +181,15 @@
   content: ''; position: absolute; inset: 0;
   background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(232,100,58,.08), transparent 60%);
   opacity: 0; transition: opacity .3s;
+  pointer-events: none;
 }
 .cat-card:hover::after { opacity: 1; }
+
+/* cat arrow reveal on hover */
+.cat-card:hover .cat-arrow {
+  opacity: 1 !important;
+  transform: translate(0, 0) !important;
+}
 
 /* ── btn primary slide ── */
 .btn-primary { position: relative; overflow: hidden; transition: color .3s; }
@@ -203,10 +219,10 @@
   opacity: 0; transform: translateY(28px);
   animation: slideUp .9s forwards;
 }
-.delay-1 { animation-delay: .1s; }
-.delay-3 { animation-delay: .3s; }
-.delay-5 { animation-delay: .55s; }
-.delay-7 { animation-delay: .75s; }
+.delay-1  { animation-delay: .1s; }
+.delay-3  { animation-delay: .3s; }
+.delay-5  { animation-delay: .55s; }
+.delay-7  { animation-delay: .75s; }
 .delay-10 { animation-delay: 1s; }
 
 .reveal {
@@ -214,3 +230,13 @@
   transition: opacity .75s ease, transform .75s ease;
 }
 .reveal.in { opacity: 1; transform: translateY(0); }
+
+/* ── reduce motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .anim-up    { animation: none; opacity: 1; transform: none; }
+  .reveal     { transition: none; opacity: 1; transform: none; }
+  .chip-dot   { animation: none; }
+  .scroll-line{ animation: none; }
+  .ticker-inner { animation-play-state: paused; }
+  .o1, .o2, .o3 { animation: none; }
+}
