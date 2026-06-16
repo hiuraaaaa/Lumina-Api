@@ -27,6 +27,15 @@ export const ENDPOINTS: EndpointDoc[] = [
     ],
   },
   {
+    slug:     'qwen3',
+    category: 'AI CHAT',
+    name:     'Qwen3 Coder',
+    desc:     'Chat dengan Qwen3 Coder AI secara gratis.',
+    path:     '/api/ai-chat/qwen3',
+    method:   'GET',
+    params:   [{ name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Qwen3 Coder' }],
+  },
+  {
     slug:     'tiktok',
     category: 'DOWNLOADER',
     name:     'TikTok Downloader',
