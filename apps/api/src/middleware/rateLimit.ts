@@ -4,7 +4,6 @@ const rateMap = new Map<string, { count: number; resetAt: number }>()
 const RATE_LIMIT  = 60
 const RATE_WINDOW = 60_000
 
-// Cleanup stale entries tiap 5 menit
 setInterval(() => {
   const now = Date.now()
   for (const [ip, entry] of rateMap.entries()) {
@@ -26,11 +25,7 @@ function checkRateLimit(ip: string): boolean {
 export const rateLimitMiddleware: MiddlewareHandler = async (c, next) => {
   const ip = c.get('ip') ?? 'unknown'
   if (!checkRateLimit(ip)) {
-    return c.json({
-      status: false, statusCode: 429, creator: 'Xena',
-      error: 'Too many requests. Please slow down.',
-      retryAfter: '60s'
-    }, 429)
+    return c.json({ status: false, statusCode: 429, creator: 'Xena', error: 'Too many requests.', retryAfter: '60s' }, 429)
   }
   await next()
 }

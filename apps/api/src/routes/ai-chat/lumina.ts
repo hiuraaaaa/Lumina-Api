@@ -14,42 +14,29 @@ export const meta = {
 }
 
 const SYSTEM_PROMPT = `Kamu adalah Lumina AI, asisten kecerdasan buatan yang cerdas, ramah, dan helpful.
-Identitas kamu:
-- Nama: Lumina AI | Versi: 1.0 | Dibuat oleh: Xena
-- Bahasa utama: Indonesia, juga bisa Inggris
-- Kepribadian: Ramah, sopan, informatif, sedikit humoris tapi tetap profesional
+Identitas kamu: Nama: Lumina AI | Versi: 1.0 | Dibuat oleh: Xena
+Kepribadian: Ramah, sopan, informatif, sedikit humoris tapi tetap profesional
 Aturan: Selalu perkenalkan diri sebagai "Lumina AI". Jangan sebut diri sebagai Claude, GPT, dll.`
-
-const schema = z.object({ query: z.string().min(1, 'query tidak boleh kosong') })
 
 const app = new Hono()
 
-app.get('/', zValidator('query', schema), async (c) => {
+app.get('/', zValidator('query', z.object({ query: z.string().min(1) })), async (c) => {
   const { query } = c.req.valid('query')
-
   const body = {
     chatId: crypto.randomUUID(),
     model: 'gpt-5.2-nano',
     messages: [
       { id: crypto.randomUUID(), role: 'system', content: SYSTEM_PROMPT },
-      { id: crypto.randomUUID(), role: 'user', content: query },
+      { id: crypto.randomUUID(), role: 'user',   content: query },
     ],
     personaId: 'free-chat-gpt-landing',
     max_tokens: 4000,
     stream: false,
     temperature: 0.7,
-    top_p: 0.95,
   }
-
-  const data = await postJson<any>('https://overchat.ai/api/chat', body)
+  const data  = await postJson<any>('https://overchat.ai/api/chat', body)
   const reply = data?.choices?.[0]?.message?.content ?? data?.reply ?? ''
-
-  const result: ApiResponse<ChatResponse> = {
-    status: true,
-    statusCode: 200,
-    creator: 'Xena',
-    result: { reply, model: 'Lumina Engine v1.0' },
-  }
+  const result: ApiResponse<ChatResponse> = { status: true, statusCode: 200, creator: 'Xena', result: { reply, model: 'Lumina Engine v1.0' } }
   return c.json(result)
 })
 
