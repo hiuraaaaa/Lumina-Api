@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ENDPOINTS, CATEGORIES } from '@/lib/endpoints'
 
 /* ─────────────────────────────────── icons ── */
@@ -22,6 +22,16 @@ const IconArrow = () => (
   <svg style={{ width: 20, height: 20 }}
     viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M7 17L17 7M17 7H7M17 7v10"/>
+  </svg>
+)
+const IconMenu = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M4 6h16M4 12h16M4 18h16"/>
+  </svg>
+)
+const IconClose = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M18 6L6 18M6 6l12 12"/>
   </svg>
 )
 
@@ -66,6 +76,50 @@ const TICKERS = [
   '60 req/min Free',
 ]
 
+/* ───────────────────────── api info rows ── */
+const INFO_ROWS = [
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, color: 'var(--muted)', flexShrink: 0 }}>
+        <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+    ),
+    label: 'base url', value: 'lumina-api.vercel.app', accent: true,
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, color: 'var(--muted)', flexShrink: 0 }}>
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+    ),
+    label: 'rate limit', value: '60 req / min', accent: false,
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, color: 'var(--muted)', flexShrink: 0 }}>
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    ),
+    label: 'auth', value: 'tidak perlu', accent: false,
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, color: 'var(--muted)', flexShrink: 0 }}>
+        <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+      </svg>
+    ),
+    label: 'format', value: 'JSON', accent: false,
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, color: 'var(--muted)', flexShrink: 0 }}>
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+    ),
+    label: 'status', value: '● online', accent: true,
+  },
+]
+
 export default function HomePage() {
   const curRef  = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
@@ -74,42 +128,54 @@ export default function HomePage() {
   const mx = useRef(0); const my = useRef(0)
   const rx = useRef(0); const ry = useRef(0)
 
-  useEffect(() => {
-    // cursor
-    const onMove = (e: MouseEvent) => {
-      mx.current = e.clientX; my.current = e.clientY
-      if (curRef.current) {
-        curRef.current.style.left = `${e.clientX}px`
-        curRef.current.style.top  = `${e.clientY}px`
-      }
-    }
-    document.addEventListener('mousemove', onMove)
+  const [menuOpen, setMenuOpen] = useState(false)
 
-    let raf: number
-    const animRing = () => {
-      rx.current += (mx.current - rx.current) * .11
-      ry.current += (my.current - ry.current) * .11
-      if (ringRef.current) {
-        ringRef.current.style.left = `${rx.current}px`
-        ringRef.current.style.top  = `${ry.current}px`
+  useEffect(() => {
+    // cursor — only desktop
+    const mq = window.matchMedia('(pointer: fine)')
+    if (mq.matches) {
+      const onMove = (e: MouseEvent) => {
+        mx.current = e.clientX; my.current = e.clientY
+        if (curRef.current) {
+          curRef.current.style.left = `${e.clientX}px`
+          curRef.current.style.top  = `${e.clientY}px`
+        }
+      }
+      document.addEventListener('mousemove', onMove)
+
+      let raf: number
+      const animRing = () => {
+        rx.current += (mx.current - rx.current) * .11
+        ry.current += (my.current - ry.current) * .11
+        if (ringRef.current) {
+          ringRef.current.style.left = `${rx.current}px`
+          ringRef.current.style.top  = `${ry.current}px`
+        }
+        raf = requestAnimationFrame(animRing)
       }
       raf = requestAnimationFrame(animRing)
+
+      const hoverEls = document.querySelectorAll<HTMLElement>('a, .cat-card, .itag, .btn-primary, .btn-ghost')
+      hoverEls.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          if (curRef.current)  { curRef.current.style.width  = '18px'; curRef.current.style.height  = '18px' }
+          if (ringRef.current) { ringRef.current.style.width = '50px'; ringRef.current.style.height = '50px' }
+        })
+        el.addEventListener('mouseleave', () => {
+          if (curRef.current)  { curRef.current.style.width  = '10px'; curRef.current.style.height  = '10px' }
+          if (ringRef.current) { ringRef.current.style.width = '34px'; ringRef.current.style.height = '34px' }
+        })
+      })
+
+      return () => {
+        document.removeEventListener('mousemove', onMove)
+        cancelAnimationFrame(raf)
+      }
     }
-    raf = requestAnimationFrame(animRing)
+  }, [])
 
-    const hoverEls = document.querySelectorAll<HTMLElement>('a, .cat-card, .itag, .btn-primary, .btn-ghost')
-    hoverEls.forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        if (curRef.current)  { curRef.current.style.width  = '18px'; curRef.current.style.height  = '18px' }
-        if (ringRef.current) { ringRef.current.style.width = '50px'; ringRef.current.style.height = '50px' }
-      })
-      el.addEventListener('mouseleave', () => {
-        if (curRef.current)  { curRef.current.style.width  = '10px'; curRef.current.style.height  = '10px' }
-        if (ringRef.current) { ringRef.current.style.width = '34px'; ringRef.current.style.height = '34px' }
-      })
-    })
-
-    // scroll
+  useEffect(() => {
+    // scroll progress + nav
     const onScroll = () => {
       if (progRef.current)
         progRef.current.style.width =
@@ -117,7 +183,7 @@ export default function HomePage() {
       if (navRef.current)
         navRef.current.classList.toggle('scrolled', window.scrollY > 60)
     }
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll, { passive: true })
 
     // reveal
     const obs = new IntersectionObserver(entries =>
@@ -127,12 +193,24 @@ export default function HomePage() {
     document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
 
     return () => {
-      document.removeEventListener('mousemove', onMove)
       window.removeEventListener('scroll', onScroll)
-      cancelAnimationFrame(raf)
       obs.disconnect()
     }
   }, [])
+
+  // close menu on resize to desktop
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)')
+    const handler = (e: MediaQueryListEvent) => { if (e.matches) setMenuOpen(false) }
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  // close menu on route / scroll lock
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
 
   /* cat card spotlight glow */
   const onCatMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -143,8 +221,8 @@ export default function HomePage() {
 
   return (
     <>
-      {/* cursor */}
-      <div ref={curRef}  className="cur"     id="cur" />
+      {/* cursor — hidden on touch via CSS */}
+      <div ref={curRef}  className="cur"      id="cur" />
       <div ref={ringRef} className="cur-ring" id="curRing" />
 
       {/* scroll progress */}
@@ -154,68 +232,135 @@ export default function HomePage() {
       <nav
         ref={navRef}
         id="nav"
+        className="[&.scrolled]:bg-[rgba(10,10,15,0.85)] [&.scrolled]:backdrop-blur-xl [&.scrolled]:border-b [&.scrolled]:border-white/[0.07]"
         style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '1.4rem 3rem',
           background: 'rgba(10,10,15,0)',
           backdropFilter: 'blur(0px)',
           borderBottom: '1px solid transparent',
           transition: 'background .5s, backdrop-filter .5s, border-color .5s',
         }}
-        className="[&.scrolled]:bg-[rgba(10,10,15,0.85)] [&.scrolled]:backdrop-blur-xl [&.scrolled]:border-b [&.scrolled]:border-white/[0.07]"
       >
-        <Link href="/" style={{
-          fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '1.05rem',
-          letterSpacing: '-.03em', color: 'var(--text)', textDecoration: 'none',
-        }}>
-          Lumina<span style={{ color: 'var(--accent)' }}>.</span>
-        </Link>
-        <ul style={{ display: 'flex', gap: '2.5rem', listStyle: 'none' }}>
-          {[
-            { label: 'Endpoints', href: '#cats' },
-            { label: 'Docs',      href: '/docs' },
-            { label: 'Playground',href: '/playground' },
-          ].map(l => (
-            <li key={l.label}>
-              <Link href={l.href} style={{
-                fontSize: '.7rem', letterSpacing: '.12em', textTransform: 'uppercase',
-                color: 'var(--muted)', textDecoration: 'none',
-              }}
-                className="hover:text-[var(--text)] transition-colors relative
-                  after:absolute after:bottom-[-3px] after:left-0 after:w-0 after:h-px
-                  after:bg-[var(--accent)] after:transition-all hover:after:w-full"
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 1rem', height: '60px',
+          maxWidth: '1280px', margin: '0 auto',
+        }}
+          className="sm:px-6 lg:px-8"
+        >
+          {/* logo */}
+          <Link href="/" style={{
+            fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '1.05rem',
+            letterSpacing: '-.03em', color: 'var(--text)', textDecoration: 'none',
+            flexShrink: 0,
+          }}>
+            Lumina<span style={{ color: 'var(--accent)' }}>.</span>
+          </Link>
+
+          {/* desktop links */}
+          <ul className="hidden md:flex" style={{ gap: '2.5rem', listStyle: 'none', margin: 0, padding: 0 }}>
+            {[
+              { label: 'Endpoints', href: '#cats' },
+              { label: 'Docs',      href: '/docs' },
+              { label: 'Playground',href: '/playground' },
+            ].map(l => (
+              <li key={l.label}>
+                <Link href={l.href} style={{
+                  fontSize: '.7rem', letterSpacing: '.12em', textTransform: 'uppercase',
+                  color: 'var(--muted)', textDecoration: 'none',
+                }}
+                  className="hover:text-[var(--text)] transition-colors relative
+                    after:absolute after:bottom-[-3px] after:left-0 after:w-0 after:h-px
+                    after:bg-[var(--accent)] after:transition-all hover:after:w-full"
+                >
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* hamburger */}
+          <button
+            className="md:hidden"
+            onClick={() => setMenuOpen(v => !v)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            style={{
+              background: 'none', border: 'none', color: 'var(--text)',
+              cursor: 'pointer', padding: '11px', minWidth: 44, minHeight: 44,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            {menuOpen ? <IconClose /> : <IconMenu />}
+          </button>
+        </div>
+
+        {/* mobile drawer */}
+        {menuOpen && (
+          <div
+            className="md:hidden"
+            style={{
+              background: 'rgba(10,10,15,0.97)',
+              backdropFilter: 'blur(20px)',
+              borderTop: '1px solid var(--border)',
+              padding: '1.5rem 1.5rem 2rem',
+              display: 'flex', flexDirection: 'column', gap: '.25rem',
+            }}
+          >
+            {[
+              { label: 'Endpoints', href: '#cats' },
+              { label: 'Docs',      href: '/docs' },
+              { label: 'Playground',href: '/playground' },
+            ].map(l => (
+              <Link
+                key={l.label}
+                href={l.href}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  fontSize: '.75rem', letterSpacing: '.14em', textTransform: 'uppercase',
+                  color: 'var(--muted)', textDecoration: 'none',
+                  padding: '.85rem 0', borderBottom: '1px solid var(--border)',
+                  minHeight: 44, display: 'flex', alignItems: 'center',
+                  transition: 'color .2s',
+                }}
+                className="hover:text-[var(--text)]"
               >
                 {l.label}
               </Link>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+        )}
       </nav>
 
       {/* ── HERO ── */}
       <section
         id="hero"
         style={{
-          minHeight: '100vh', display: 'flex', flexDirection: 'column',
-          justifyContent: 'flex-end', padding: '0 3rem 5.5rem',
+          minHeight: '100svh',
+          display: 'flex', flexDirection: 'column',
+          justifyContent: 'flex-end',
+          padding: '80px 1rem 3rem',
           position: 'relative', overflow: 'hidden',
         }}
+        className="sm:px-6 lg:px-8 lg:pb-[5.5rem]"
       >
         <div className="hero-grid" />
         <div className="orb o1" /><div className="orb o2" /><div className="orb o3" />
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 370px', gap: '4rem', alignItems: 'flex-end', position: 'relative', zIndex: 1 }}>
-          {/* left */}
+        {/* 2-col on desktop, single col on mobile */}
+        <div
+          style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto', width: '100%' }}
+          className="flex flex-col lg:grid lg:grid-cols-[1fr_370px] lg:gap-16 lg:items-end gap-8"
+        >
+          {/* ── LEFT ── */}
           <div>
             {/* chip */}
             <div className="anim-up delay-1" style={{
               display: 'inline-flex', alignItems: 'center', gap: '.8rem',
               padding: '.45rem .95rem .45rem .45rem',
               background: 'var(--surface)', border: '1px solid var(--border)',
-              borderRadius: 100, marginBottom: '2.5rem',
+              borderRadius: 100, marginBottom: '2rem',
             }}>
-              <div className="chip-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--a3)' }} />
+              <div className="chip-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--a3)', flexShrink: 0 }} />
               <span style={{ fontSize: '.68rem', letterSpacing: '.1em', color: 'var(--muted)' }}>
                 <b style={{ color: 'var(--text)' }}>{ENDPOINTS.length}+ endpoints</b> · no auth required
               </span>
@@ -224,8 +369,8 @@ export default function HomePage() {
             {/* title */}
             <h1 className="anim-up delay-3" style={{
               fontFamily: "'Syne', sans-serif", fontWeight: 800,
-              fontSize: 'clamp(3.8rem, 8.5vw, 8rem)',
-              lineHeight: .9, letterSpacing: '-.045em', marginBottom: '1.8rem',
+              fontSize: 'clamp(3.2rem, 10vw, 8rem)',
+              lineHeight: .9, letterSpacing: '-.045em', marginBottom: '1.5rem',
             }}>
               Free<br />
               <span style={{ fontFamily: "'Instrument Serif', serif", fontStyle: 'italic', fontWeight: 400, color: 'var(--accent)' }}>REST</span><br />
@@ -234,18 +379,18 @@ export default function HomePage() {
 
             {/* sub */}
             <p className="anim-up delay-5" style={{
-              fontSize: '.78rem', lineHeight: 2, color: 'var(--muted)',
-              maxWidth: 480, marginBottom: '2.8rem',
+              fontSize: 'clamp(.75rem, 2vw, .78rem)', lineHeight: 2, color: 'var(--muted)',
+              maxWidth: 480, marginBottom: '2.2rem',
             }}>
               Lumina API — AI Chat, Downloader, Tools, Anime.<br />
               <b style={{ color: 'var(--text)' }}>Tanpa registrasi.</b> Langsung pakai. Gratis selamanya.
             </p>
 
             {/* btns */}
-            <div className="anim-up delay-7" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div className="anim-up delay-7" style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap' }}>
               <Link href="/docs" className="btn-primary" style={{
                 display: 'inline-flex', alignItems: 'center', gap: '.6rem',
-                padding: '.85rem 1.8rem',
+                padding: '0 1.6rem', minHeight: 48,
                 fontFamily: "'DM Mono', monospace", fontSize: '.72rem',
                 letterSpacing: '.1em', textTransform: 'uppercase',
                 background: 'var(--accent)', color: 'var(--bg)',
@@ -255,7 +400,7 @@ export default function HomePage() {
               </Link>
               <Link href="/playground" className="btn-ghost" style={{
                 display: 'inline-flex', alignItems: 'center', gap: '.6rem',
-                padding: '.85rem 1.8rem',
+                padding: '0 1.6rem', minHeight: 48,
                 fontFamily: "'DM Mono', monospace", fontSize: '.72rem',
                 letterSpacing: '.1em', textTransform: 'uppercase',
                 background: 'transparent', color: 'var(--text)',
@@ -265,9 +410,9 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* scroll hint */}
-            <div className="anim-up delay-10" style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 7,
+            {/* scroll hint — desktop only */}
+            <div className="anim-up delay-10 hidden lg:flex" style={{
+              flexDirection: 'column', alignItems: 'flex-start', gap: 7,
               fontSize: '.6rem', letterSpacing: '.18em', textTransform: 'uppercase',
               color: 'var(--muted)', marginTop: '2.5rem',
             }}>
@@ -279,61 +424,21 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* right — info card */}
+          {/* ── RIGHT — info card ── */}
           <div className="anim-up delay-5" style={{
             background: 'var(--surface)', border: '1px solid var(--border)', padding: '1.4rem',
+            width: '100%',
           }}>
-            {[
-              {
-                icon: (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, color: 'var(--muted)' }}>
-                    <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                  </svg>
-                ),
-                label: 'base url', value: 'lumina-api.vercel.app', accent: true,
-              },
-              {
-                icon: (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, color: 'var(--muted)' }}>
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                  </svg>
-                ),
-                label: 'rate limit', value: '60 req / min', accent: false,
-              },
-              {
-                icon: (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, color: 'var(--muted)' }}>
-                    <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                  </svg>
-                ),
-                label: 'auth', value: 'tidak perlu', accent: false,
-              },
-              {
-                icon: (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, color: 'var(--muted)' }}>
-                    <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-                  </svg>
-                ),
-                label: 'format', value: 'JSON', accent: false,
-              },
-              {
-                icon: (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, color: 'var(--muted)' }}>
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-                  </svg>
-                ),
-                label: 'status', value: '● online', accent: true,
-              },
-            ].map((row, i, arr) => (
+            {INFO_ROWS.map((row, i, arr) => (
               <div key={row.label} style={{
-                display: 'grid', gridTemplateColumns: '16px 80px 1fr',
+                display: 'grid', gridTemplateColumns: '16px minmax(70px, 90px) 1fr',
                 gap: '.7rem', alignItems: 'center',
                 padding: '.6rem 0',
                 borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none',
               }}>
                 {row.icon}
                 <span style={{ fontSize: '.6rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--muted)' }}>{row.label}</span>
-                <span style={{ fontSize: '.72rem', color: row.accent ? 'var(--accent)' : 'var(--text)' }}>{row.value}</span>
+                <span style={{ fontSize: '.72rem', color: row.accent ? 'var(--accent)' : 'var(--text)', wordBreak: 'break-all' }}>{row.value}</span>
               </div>
             ))}
 
@@ -344,10 +449,11 @@ export default function HomePage() {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem' }}>
               {['AI Chat', 'Downloader', 'Anime', 'Tools'].map(tag => (
                 <span key={tag} className="itag" style={{
-                  fontSize: '.62rem', padding: '.22rem .55rem',
+                  fontSize: '.62rem', padding: '.22rem .55rem', minHeight: 28,
+                  display: 'inline-flex', alignItems: 'center',
                   background: 'rgba(255,255,255,.04)', border: '1px solid var(--border)',
                   borderRadius: 100, color: 'var(--muted)',
-                  transition: 'all .25s', cursor: 'none',
+                  transition: 'all .25s', cursor: 'default',
                 }}
                   onMouseEnter={e => { (e.target as HTMLElement).style.borderColor = 'var(--accent)'; (e.target as HTMLElement).style.color = 'var(--accent)' }}
                   onMouseLeave={e => { (e.target as HTMLElement).style.borderColor = 'var(--border)'; (e.target as HTMLElement).style.color = 'var(--muted)' }}
@@ -381,126 +487,136 @@ export default function HomePage() {
       </div>
 
       {/* ── STATS ── */}
-      <section style={{ padding: '5rem 3rem' }}>
-        <div className="reveal" style={{
-          display: 'grid', gridTemplateColumns: 'repeat(3,1fr)',
-          gap: 1, background: 'var(--border)',
-        }}>
-          {[
-            { num: `${ENDPOINTS.length}`, suffix: '+', label: 'Endpoints',  desc: 'AI, downloader, anime, tools' },
-            { num: `${CATEGORIES.length}`, suffix: '+', label: 'Kategori',   desc: 'Organized by use case' },
-            { num: '60',  suffix: '/m',label: 'Rate Limit', desc: 'Per IP, tanpa login' },
-          ].map(s => (
-            <div key={s.label} className="stat-card" style={{ background: 'var(--bg)', padding: '2.5rem', transition: 'background .35s' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg)')}
-            >
-              <div style={{ fontFamily: "'Syne', sans-serif", fontSize: '3.5rem', fontWeight: 800, lineHeight: 1, color: 'var(--text)' }}>
-                {s.num}<b style={{ color: 'var(--accent)' }}>{s.suffix}</b>
+      <section style={{ padding: 'clamp(3rem, 6vw, 5rem) 1rem' }} className="sm:px-6 lg:px-8">
+        <div
+          className="reveal"
+          style={{ maxWidth: 1280, margin: '0 auto' }}
+        >
+          {/* mobile: stack, tablet+: 3 col grid */}
+          <div
+            className="grid grid-cols-1 sm:grid-cols-3"
+            style={{ gap: 1, background: 'var(--border)' }}
+          >
+            {[
+              { num: `${ENDPOINTS.length}`, suffix: '+', label: 'Endpoints',  desc: 'AI, downloader, anime, tools' },
+              { num: `${CATEGORIES.length}`, suffix: '+', label: 'Kategori',   desc: 'Organized by use case' },
+              { num: '60',  suffix: '/m', label: 'Rate Limit', desc: 'Per IP, tanpa login' },
+            ].map(s => (
+              <div key={s.label} className="stat-card" style={{ background: 'var(--bg)', padding: 'clamp(1.5rem, 4vw, 2.5rem)', transition: 'background .35s' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg)')}
+              >
+                <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(2.5rem, 7vw, 3.5rem)', fontWeight: 800, lineHeight: 1, color: 'var(--text)' }}>
+                  {s.num}<b style={{ color: 'var(--accent)' }}>{s.suffix}</b>
+                </div>
+                <div style={{ fontSize: '.65rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--muted)', marginTop: '.5rem' }}>{s.label}</div>
+                <div style={{ fontSize: '.72rem', color: 'var(--muted)', marginTop: '.3rem', opacity: .7 }}>{s.desc}</div>
               </div>
-              <div style={{ fontSize: '.65rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--muted)', marginTop: '.5rem' }}>{s.label}</div>
-              <div style={{ fontSize: '.72rem', color: 'var(--muted)', marginTop: '.3rem', opacity: .7 }}>{s.desc}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── CATEGORIES ── */}
-      <section id="cats" style={{ padding: '0 3rem 6rem' }}>
-        <div className="reveal">
-          <p style={{ fontSize: '.62rem', letterSpacing: '.22em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '.9rem' }}>
-            Endpoint Categories
-          </p>
-          <h2 style={{
-            fontFamily: "'Syne', sans-serif", fontWeight: 800,
-            fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', letterSpacing: '-.03em',
-            lineHeight: 1, marginBottom: '3rem',
-          }}>
-            Apa yang bisa<br /><span style={{ color: 'var(--muted)' }}>kamu pakai</span>
-          </h2>
-        </div>
+      <section id="cats" style={{ padding: '0 1rem clamp(3rem, 6vw, 6rem)' }} className="sm:px-6 lg:px-8">
+        <div className="reveal" style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <div style={{ marginBottom: '3rem' }}>
+            <p style={{ fontSize: '.62rem', letterSpacing: '.22em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '.9rem' }}>
+              Endpoint Categories
+            </p>
+            <h2 style={{
+              fontFamily: "'Syne', sans-serif", fontWeight: 800,
+              fontSize: 'clamp(1.8rem, 5vw, 3.5rem)', letterSpacing: '-.03em',
+              lineHeight: 1, marginBottom: 0,
+            }}>
+              Apa yang bisa<br /><span style={{ color: 'var(--muted)' }}>kamu pakai</span>
+            </h2>
+          </div>
 
-        <div className="reveal" style={{
-          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: 1, background: 'var(--border)',
-        }}>
-          {CATEGORIES.map(cat => {
-            const count   = ENDPOINTS.filter(e => e.category === cat).length
-            const catSlug = cat.toLowerCase().replace(/\s+/g, '-')
-            return (
-              <Link
-                key={cat}
-                href={`/docs#${catSlug}`}
-                className="cat-card"
-                onMouseMove={onCatMove}
-                style={{
-                  background: 'var(--bg)', padding: '1.8rem',
-                  textDecoration: 'none', position: 'relative', overflow: 'hidden',
-                  transition: 'background .3s', cursor: 'none', display: 'block',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg)')}
-              >
-                <div style={{ width: 32, height: 32, marginBottom: '1rem', color: 'var(--accent)', opacity: .9 }}>
-                  {CAT_ICONS[cat] ?? (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
-                      <rect x="3" y="3" width="18" height="18" rx="2"/>
-                    </svg>
-                  )}
-                </div>
-                <div style={{
-                  fontFamily: "'Syne', sans-serif", fontWeight: 700,
-                  fontSize: '.85rem', color: 'var(--text)', marginBottom: '.3rem',
-                  transition: 'color .3s',
-                }}
-                  className="group-hover:text-[var(--accent)]"
+          {/* 1 col mobile → 2 col sm → 4 col lg */}
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+            style={{ gap: 1, background: 'var(--border)' }}
+          >
+            {CATEGORIES.map(cat => {
+              const count   = ENDPOINTS.filter(e => e.category === cat).length
+              const catSlug = cat.toLowerCase().replace(/\s+/g, '-')
+              return (
+                <Link
+                  key={cat}
+                  href={`/docs#${catSlug}`}
+                  className="cat-card"
+                  onMouseMove={onCatMove}
+                  style={{
+                    background: 'var(--bg)', padding: 'clamp(1.2rem, 3vw, 1.8rem)',
+                    textDecoration: 'none', position: 'relative', overflow: 'hidden',
+                    transition: 'background .3s', display: 'block',
+                    minHeight: 44,
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg)')}
                 >
-                  {cat}
-                </div>
-                <div style={{ fontSize: '.65rem', color: 'var(--muted)' }}>
-                  {count} endpoint{count > 1 ? 's' : ''}
-                </div>
-                <div style={{
-                  position: 'absolute', bottom: '1.2rem', right: '1.2rem',
-                  width: 20, height: 20, opacity: 0,
-                  transform: 'translate(-4px, 4px)',
-                  transition: 'opacity .3s, transform .3s',
-                  color: 'var(--accent)',
-                }}
-                  className="cat-arrow"
-                >
-                  <IconArrow />
-                </div>
-              </Link>
-            )
-          })}
+                  <div style={{ width: 32, height: 32, marginBottom: '1rem', color: 'var(--accent)', opacity: .9 }}>
+                    {CAT_ICONS[cat] ?? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                      </svg>
+                    )}
+                  </div>
+                  <div style={{
+                    fontFamily: "'Syne', sans-serif", fontWeight: 700,
+                    fontSize: 'clamp(.8rem, 2vw, .85rem)', color: 'var(--text)', marginBottom: '.3rem',
+                    transition: 'color .3s',
+                  }}>
+                    {cat}
+                  </div>
+                  <div style={{ fontSize: '.65rem', color: 'var(--muted)' }}>
+                    {count} endpoint{count > 1 ? 's' : ''}
+                  </div>
+                  <div style={{
+                    position: 'absolute', bottom: '1.2rem', right: '1.2rem',
+                    width: 20, height: 20, opacity: 0,
+                    transform: 'translate(-4px, 4px)',
+                    transition: 'opacity .3s, transform .3s',
+                    color: 'var(--accent)',
+                  }}
+                    className="cat-arrow"
+                  >
+                    <IconArrow />
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </section>
 
       {/* ── CTA ── */}
       <section id="cta" style={{
-        padding: '7rem 3rem', background: 'var(--bg2)',
+        padding: 'clamp(4rem, 8vw, 7rem) 1rem',
+        background: 'var(--bg2)',
         textAlign: 'center', position: 'relative', overflow: 'hidden',
-      }}>
+      }} className="sm:px-6 lg:px-8">
         {/* bg grid */}
         <div style={{
           position: 'absolute', inset: 0,
           backgroundImage: 'linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px)',
           backgroundSize: '72px 72px',
+          pointerEvents: 'none',
         }} />
         {/* orb */}
         <div style={{
-          position: 'absolute', width: 500, height: 500, borderRadius: '50%',
+          position: 'absolute', width: 'min(500px, 100vw)', height: 'min(500px, 100vw)', borderRadius: '50%',
           filter: 'blur(100px)',
           background: 'radial-gradient(circle,rgba(124,92,252,.14),transparent 70%)',
           top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
           pointerEvents: 'none',
         }} />
 
-        <div className="reveal" style={{ position: 'relative' }}>
+        <div className="reveal" style={{ position: 'relative', maxWidth: 700, margin: '0 auto' }}>
           <h2 style={{
             fontFamily: "'Syne', sans-serif", fontWeight: 800,
-            fontSize: 'clamp(2.8rem, 7vw, 6rem)',
+            fontSize: 'clamp(2.4rem, 9vw, 6rem)',
             letterSpacing: '-.045em', lineHeight: .92, marginBottom: '1.5rem',
           }}>
             Mulai<br />
@@ -508,13 +624,13 @@ export default function HomePage() {
               sekarang
             </span>
           </h2>
-          <p style={{ fontSize: '.78rem', color: 'var(--muted)', marginBottom: '3rem', letterSpacing: '.05em' }}>
+          <p style={{ fontSize: 'clamp(.72rem, 2vw, .78rem)', color: 'var(--muted)', marginBottom: '2.5rem', letterSpacing: '.05em' }}>
             tidak perlu daftar. tidak perlu api key. langsung request.
           </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/docs" className="btn-primary" style={{
               display: 'inline-flex', alignItems: 'center', gap: '.6rem',
-              padding: '.85rem 1.8rem',
+              padding: '0 1.6rem', minHeight: 48,
               fontFamily: "'DM Mono', monospace", fontSize: '.72rem',
               letterSpacing: '.1em', textTransform: 'uppercase',
               background: 'var(--accent)', color: 'var(--bg)',
@@ -524,7 +640,7 @@ export default function HomePage() {
             </Link>
             <Link href="/playground" className="btn-ghost" style={{
               display: 'inline-flex', alignItems: 'center', gap: '.6rem',
-              padding: '.85rem 1.8rem',
+              padding: '0 1.6rem', minHeight: 48,
               fontFamily: "'DM Mono', monospace", fontSize: '.72rem',
               letterSpacing: '.1em', textTransform: 'uppercase',
               background: 'transparent', color: 'var(--text)',
@@ -538,13 +654,19 @@ export default function HomePage() {
 
       {/* ── FOOTER ── */}
       <footer style={{
-        padding: '1.4rem 3rem',
+        padding: '1.4rem 1rem',
         borderTop: '1px solid var(--border)',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        fontSize: '.62rem', color: 'var(--muted)', letterSpacing: '.08em',
-      }}>
-        <span>© 2026 Lumina API — by <a href="https://github.com/hiuraaaaa" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Xena</a></span>
-        <span>built from termux · shipped on vercel</span>
+        maxWidth: '100%',
+      }} className="sm:px-6 lg:px-8">
+        <div style={{
+          maxWidth: 1280, margin: '0 auto',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          flexWrap: 'wrap', gap: '.5rem',
+          fontSize: '.62rem', color: 'var(--muted)', letterSpacing: '.08em',
+        }}>
+          <span>© 2026 Lumina API — by <a href="https://github.com/hiuraaaaa" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Xena</a></span>
+          <span>built from termux · shipped on vercel</span>
+        </div>
       </footer>
     </>
   )
