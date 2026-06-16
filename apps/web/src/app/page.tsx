@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { ENDPOINTS, CATEGORIES } from '@/lib/endpoints'
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -42,6 +43,34 @@ const TICKER_ITEMS = [
   'No Registration Required',
   '60 req/min · Free Forever',
 ]
+
+// reusable fade-up variant
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  show:   { opacity: 1, y: 0 },
+}
+
+const stagger = {
+  hidden: {},
+  show:   { transition: { staggerChildren: 0.1 } },
+}
+
+function RevealSection({ children, className }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-80px' })
+  return (
+    <motion.div
+      ref={ref}
+      variants={fadeUp}
+      initial="hidden"
+      animate={inView ? 'show' : 'hidden'}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
 export default function HomePage() {
   const curRef  = useRef<HTMLDivElement>(null)
@@ -88,21 +117,13 @@ export default function HomePage() {
     }
     window.addEventListener('scroll', onScroll)
 
-    const obs = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in') }),
-      { threshold: .08 }
-    )
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
-
     return () => {
       document.removeEventListener('mousemove', onMove)
       window.removeEventListener('scroll', onScroll)
       cancelAnimationFrame(raf)
-      obs.disconnect()
     }
   }, [])
 
-  // lock body scroll when menu open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -121,12 +142,31 @@ export default function HomePage() {
       <div className="cur-ring" ref={ringRef} />
       <div className="prog" ref={progRef} />
 
-      {/* mobile menu overlay */}
-      <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
-        <Link href="#cats"       onClick={() => setMenuOpen(false)}>Endpoints</Link>
-        <Link href="/docs"       onClick={() => setMenuOpen(false)}>Docs</Link>
-        <Link href="/playground" onClick={() => setMenuOpen(false)}>Playground</Link>
-      </div>
+      {/* mobile menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            className="mobile-menu open"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.97 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
+            {['#cats', '/docs', '/playground'].map((href, i) => (
+              <motion.div
+                key={href}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.07 + 0.1 }}
+              >
+                <Link href={href} onClick={() => setMenuOpen(false)}>
+                  {['Endpoints', 'Docs', 'Playground'][i]}
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* nav */}
       <nav ref={navRef} id="lnav">
@@ -153,25 +193,40 @@ export default function HomePage() {
         <div className="orb o3" />
 
         <div className="hero-inner">
-          {/* left */}
-          <div>
-            <div className="chip">
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            animate="show"
+          >
+            <motion.div className="chip" variants={fadeUp} transition={{ duration: 0.5, ease: 'easeOut' }}>
               <div className="chip-dot" />
               <span className="chip-text"><b>{ENDPOINTS.length}+ endpoints</b> · no auth</span>
-            </div>
+            </motion.div>
 
-            <h1 className="hero-title">
+            <motion.h1
+              className="hero-title"
+              variants={fadeUp}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            >
               Free<br />
               <span className="serif accent">REST</span><br />
               <span className="dim">API</span>
-            </h1>
+            </motion.h1>
 
-            <p className="hero-sub">
+            <motion.p
+              className="hero-sub"
+              variants={fadeUp}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+            >
               Lumina API — AI Chat, Downloader, Tools, Anime.<br />
               <b>Tanpa registrasi.</b> Langsung pakai. Gratis selamanya.
-            </p>
+            </motion.p>
 
-            <div className="hero-btns">
+            <motion.div
+              className="hero-btns"
+              variants={fadeUp}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            >
               <Link href="/docs" className="btn-primary">
                 <svg style={{width:13,height:13,position:'relative',zIndex:1}} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -185,16 +240,25 @@ export default function HomePage() {
                 </svg>
                 <span>Try Playground</span>
               </Link>
-            </div>
+            </motion.div>
 
-            <div className="scroll-hint">
+            <motion.div
+              className="scroll-hint"
+              variants={fadeUp}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
               <div className="scroll-line" />
               scroll
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* info card — stacks below on mobile, right col on desktop */}
-          <div className="info-card">
+          {/* info card */}
+          <motion.div
+            className="info-card"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          >
             <div className="irow">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
               <span className="ilabel">base url</span>
@@ -225,7 +289,7 @@ export default function HomePage() {
             <div className="itags">
               {CATEGORIES.map(c => <span key={c} className="itag">{c}</span>)}
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -242,64 +306,85 @@ export default function HomePage() {
 
       {/* stats */}
       <section id="stats">
-        <div className="stats-grid reveal">
-          <div className="stat-card">
-            <div className="stat-num">{ENDPOINTS.length}<b>+</b></div>
-            <div className="stat-label">Endpoints</div>
-            <div className="stat-desc">AI, downloader, anime, tools</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-num">{CATEGORIES.length}<b>+</b></div>
-            <div className="stat-label">Kategori</div>
-            <div className="stat-desc">Organized by use case</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-num">60<b>/m</b></div>
-            <div className="stat-label">Rate Limit</div>
-            <div className="stat-desc">Per IP, tanpa login</div>
-          </div>
-        </div>
+        <motion.div
+          className="stats-grid"
+          variants={stagger}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-80px' }}
+        >
+          {[
+            { num: `${ENDPOINTS.length}+`, label: 'Endpoints',   desc: 'AI, downloader, anime, tools' },
+            { num: `${CATEGORIES.length}+`, label: 'Kategori',   desc: 'Organized by use case' },
+            { num: '60/m',                  label: 'Rate Limit',  desc: 'Per IP, tanpa login' },
+          ].map(({ num, label, desc }) => (
+            <motion.div
+              key={label}
+              className="stat-card"
+              variants={fadeUp}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ backgroundColor: 'var(--surface)' }}
+            >
+              <div className="stat-num">{num.replace(/\+|\/m/, '')}<b>{num.includes('+') ? '+' : '/m'}</b></div>
+              <div className="stat-label">{label}</div>
+              <div className="stat-desc">{desc}</div>
+            </motion.div>
+          ))}
+        </motion.div>
       </section>
 
       {/* categories */}
       <section id="cats">
-        <div className="reveal">
+        <RevealSection>
           <p className="sec-eyebrow">Endpoint Categories</p>
           <h2 className="sec-title">Apa yang bisa<br /><span className="dim">kamu pakai</span></h2>
-        </div>
-        <div className="cats-grid reveal">
+        </RevealSection>
+
+        <motion.div
+          className="cats-grid"
+          variants={stagger}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+        >
           {CATEGORIES.map(cat => {
             const count = ENDPOINTS.filter(e => e.category === cat).length
             const slug  = cat.toLowerCase().replace(/\s+/g, '-')
             return (
-              <Link key={cat} href={`/docs#${slug}`} className="cat-card" onMouseMove={glow}>
-                {CATEGORY_ICONS[cat] ?? (
-                  <svg className="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <motion.div
+                key={cat}
+                variants={fadeUp}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <Link href={`/docs#${slug}`} className="cat-card" onMouseMove={glow}>
+                  {CATEGORY_ICONS[cat] ?? (
+                    <svg className="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
+                      <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    </svg>
+                  )}
+                  <div className="cat-name">{cat}</div>
+                  <div className="cat-count">{count} endpoint{count > 1 ? 's' : ''}</div>
+                  <svg className="cat-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M7 17L17 7M17 7H7M17 7v10"/>
                   </svg>
-                )}
-                <div className="cat-name">{cat}</div>
-                <div className="cat-count">{count} endpoint{count > 1 ? 's' : ''}</div>
-                <svg className="cat-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M7 17L17 7M17 7H7M17 7v10"/>
-                </svg>
-              </Link>
+                </Link>
+              </motion.div>
             )
           })}
-        </div>
+        </motion.div>
       </section>
 
       {/* cta */}
       <section id="cta">
         <div className="cta-orb" />
-        <div className="reveal">
+        <RevealSection>
           <h2 className="cta-title">Mulai<br /><span className="serif">sekarang</span></h2>
           <p className="cta-sub">tidak perlu daftar. tidak perlu api key. langsung request.</p>
           <div className="cta-btns">
             <Link href="/docs"       className="btn-primary"><span>Baca Dokumentasi</span></Link>
             <Link href="/playground" className="btn-ghost"><span>Coba Playground</span></Link>
           </div>
-        </div>
+        </RevealSection>
       </section>
 
       <footer>
