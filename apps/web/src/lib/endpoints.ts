@@ -36,6 +36,15 @@ export const ENDPOINTS: EndpointDoc[] = [
     params:   [{ name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Qwen3 Coder' }],
   },
   {
+    slug:     'gita',
+    category: 'AI CHAT',
+    name:     'Gita AI',
+    desc:     'Chat dengan Bhagavad Gita AI Assistant secara gratis.',
+    path:     '/api/ai-chat/gita',
+    method:   'GET',
+    params:   [{ name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Gita AI' }],
+  },
+  {
     slug:     'tiktok',
     category: 'DOWNLOADER',
     name:     'TikTok Downloader',
