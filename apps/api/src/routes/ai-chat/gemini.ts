@@ -5,9 +5,10 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import axios from 'axios'
 import type { ApiResponse, ChatResponse } from '../../lib/types'
 import crypto from 'crypto'
+
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
 
 export const meta = {
   name:     'Gemini AI',
