@@ -26,6 +26,9 @@ import toolsGenius,   { meta as metaGenius }    from './routes/tools/genius'
 import animeSearch,   { meta as metaAnimeSearch }   from './routes/anime/search'
 import animeSchedule, { meta as metaAnimeSchedule } from './routes/anime/schedule'
 
+//======= Account (login-protected) =======//
+import accountKeys from './routes/account/keys'
+
 const app = new Hono()
 
 // Global middleware
@@ -54,6 +57,9 @@ app.route('/api/tools/ssweb',       toolsSsweb)
 app.route('/api/tools/genius',      toolsGenius)
 app.route('/api/anime/search',      animeSearch)
 app.route('/api/anime/schedule',    animeSchedule)
+
+// Routes Account (butuh Firebase ID token, bukan x-api-key)
+app.route('/api/account/keys',      accountKeys)
 
 // Endpoints listing
 const ALL_META = [
