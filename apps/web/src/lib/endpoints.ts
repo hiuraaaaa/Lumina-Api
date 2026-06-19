@@ -65,6 +65,17 @@ export const ENDPOINTS: EndpointDoc[] = [
     method: 'GET',
     params: [{ name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Llama 4 Scout' }],
   },
+    {
+    slug: 'claude3.5', 
+    category: 'AI CHAT', 
+    name: 'Overchat AI',
+    desc: 'Chat dengan Claude 3.5 Sonnet via Overchat AI. Support session/memory.',
+    path: '/api/ai-chat/claude3.5', method: 'GET',
+    params: [
+      { name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk AI' },
+      { name: 'session', type: 'query', required: false, description: 'Nama session memory (opsional)' }
+    ],
+  },
   {
     slug:     'tiktok',
     category: 'DOWNLOADER',
