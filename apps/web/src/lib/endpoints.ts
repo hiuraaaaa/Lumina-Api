@@ -45,6 +45,17 @@ export const ENDPOINTS: EndpointDoc[] = [
     params:   [{ name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Gita AI' }],
   },
   {
+  slug:     'gemini',
+  category: 'AI CHAT',
+  name:     'Gemini AI',
+  desc:     'Chat dengan Google Gemini AI tanpa API key. Support session/memory percakapan.',
+  path:     '/api/ai-chat/gemini',
+  method:   'GET',
+  params:   [
+    { name: 'query',   type: 'query', required: true,  description: 'Pertanyaan atau pesan untuk Gemini' },
+    { name: 'session', type: 'query', required: false, description: 'Nama session untuk memory percakapan (opsional)' },
+  }, 
+  {
     slug:     'tiktok',
     category: 'DOWNLOADER',
     name:     'TikTok Downloader',
