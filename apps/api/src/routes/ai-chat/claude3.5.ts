@@ -16,7 +16,7 @@ export const meta: RouteDefinition = {
 
 const API = 'https://api.overchat.ai/v1/chat/completions'
 const MODEL = 'claude-haiku-4-5-20251001'
-const SESSION_DIR = path.join(process.cwd(), 'overchat-sessions')
+const SESSION_DIR = path.join('/tmp', 'overchat-sessions');
 
 if (!fs.existsSync(SESSION_DIR)) {
   fs.mkdirSync(SESSION_DIR, { recursive: true })
