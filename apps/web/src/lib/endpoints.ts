@@ -54,8 +54,17 @@ export const ENDPOINTS: EndpointDoc[] = [
   params:   [
     { name: 'query',   type: 'query', required: true,  description: 'Pertanyaan atau pesan untuk Gemini' },
     { name: 'session', type: 'query', required: false, description: 'Nama session untuk memory percakapan (opsional)' },
-  ],
-},
+    ],
+   },
+    {
+    slug: 'llama4', 
+    category: 'AI CHAT', 
+    name: 'Llama 4 Scout AI',
+    desc: 'Chat dengan Llama 4 Scout 17B tanpa API key.',
+    path: '/api/ai-chat/llama4', 
+    method: 'GET',
+    params: [{ name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Llama 4 Scout' }],
+  },
   {
     slug:     'tiktok',
     category: 'DOWNLOADER',
