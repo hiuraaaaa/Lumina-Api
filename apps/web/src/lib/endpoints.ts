@@ -76,7 +76,19 @@ export const ENDPOINTS: EndpointDoc[] = [
     path: '/api/ai-chat/claude3.5', method: 'GET',
     params: [
       { name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk AI' },
-      { name: 'session', type: 'query', required: false, description: 'Nama session memory (opsional)' }
+      { name: 'session', type: 'query', required: false, description: 'Nama session memory (opsional)' }, 
+    ],
+  },
+  {
+  slug: 'copilot',
+  category: 'AI CHAT',
+  name: 'Microsoft Copilot',
+  desc: 'Chat dengan AI Copilot. Mendukung model Default, Think Deeper (Reasoning), dan GPT-5.',
+  path: '/api/ai-chat/copilot',
+  method: 'GET',
+  params: [
+    { name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Copilot' }, 
+    { name: 'model', type: 'query', required: false, description: 'Pilihan model: "default", "think-deeper", atau "gpt-5"' }, 
     ],
   },
   {
