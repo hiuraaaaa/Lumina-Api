@@ -13,7 +13,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     path:     '/api/ai-chat/lumina',
     method:   'GET',
     params:   [
-      { name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Lumina AI' }
+      { name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Lumina AI' }, 
       { name: 'session', type: 'query', required: false, description: 'Nama session untuk memory percakapan (opsional)' },
     ],
   },
