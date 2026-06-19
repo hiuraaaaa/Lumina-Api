@@ -13,6 +13,8 @@ import aiQwen3,       { meta as metaQwen3 }     from './routes/ai-chat/qwen3'
 import aiGita,        { meta as metaGita }      from './routes/ai-chat/gita'
 import aiGemini,      { meta as metaGemini } from './routes/ai-chat/gemini'
 import aiLlama4,      { meta as metaLlama4 }    from './routes/ai-chat/llama4' 
+import aiclaude35,    { meta as metaClaude35 }    from './routes/ai-chat/claude3.5'
+
 import dlTiktok,      { meta as metaTiktok }    from './routes/downloader/tiktok'
 import dlYoutube,     { meta as metaYoutube }   from './routes/downloader/youtube'
 import toolsSsweb,    { meta as metaSsweb }     from './routes/tools/ssweb'
@@ -37,6 +39,7 @@ app.route('/api/ai-chat/qwen3',     aiQwen3)
 app.route('/api/ai-chat/gita',      aiGita)
 app.route('/api/ai-chat/gemini', aiGemini)
 app.route('/api/ai-chat/llama4',    aiLlama4) 
+app.route('/api/ai-chat/claude3.5',    aiclaude35) 
 app.route('/api/downloader/tiktok', dlTiktok)
 app.route('/api/downloader/youtube',dlYoutube)
 app.route('/api/tools/ssweb',       toolsSsweb)
@@ -51,7 +54,8 @@ const ALL_META = [
   { path: '/api/ai-chat/qwen3',      ...metaQwen3 },
   { path: '/api/ai-chat/gita',       ...metaGita },
   { path: '/api/ai-chat/gemini', ...metaGemini },
-  { path: '/api/ai-chat/llama4',     ...metaLlama4 }, 
+  { path: '/api/ai-chat/llama4',     ...metaLlama4 },
+  { path: '/api/ai-chat/claude3.5',     ...metaClaude35 },
   { path: '/api/downloader/tiktok',  ...metaTiktok },
   { path: '/api/downloader/youtube', ...metaYoutube },
   { path: '/api/tools/ssweb',        ...metaSsweb },
