@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { https } from 'https'
+import https from 'node:https'
 
 export const meta = {
   name: 'DeepSeek AI',
