@@ -13,6 +13,7 @@
     "@lumina/types": "*",
     "@radix-ui/react-slot": "^1.3.0",
     "clsx": "^2.1.1",
+    "firebase": "^10.12.0",
     "framer-motion": "^12.40.0",
     "lenis": "^1.3.23",
     "next": "^14.2.0",
