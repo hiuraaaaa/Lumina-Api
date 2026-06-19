@@ -174,7 +174,7 @@ app.get('/', zValidator('query', schema), async (c) => {
       creator: 'Xena',
       result: {
         reply,
-        model: 'Claude Haiku 4.5',
+        model: 'Claude Claude3.5 Sonnet',
         session: session || 'default'
       } as ChatResponse & { session: string }
     })
