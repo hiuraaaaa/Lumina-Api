@@ -9,10 +9,13 @@ export const ENDPOINTS: EndpointDoc[] = [
     slug:     'lumina',
     category: 'AI CHAT',
     name:     'LuminaAI',
-    desc:     'Chat dengan Lumina AI (Original Persona) via Overchat Engine.',
+    desc:     'Asisten pintar Ai Lumina yang dikembangkan resmi oleh Perusahaan Lunar.',
     path:     '/api/ai-chat/lumina',
     method:   'GET',
-    params:   [{ name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Lumina AI' }],
+    params:   [
+      { name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Lumina AI' }
+      { name: 'session', type: 'query', required: false, description: 'Nama session untuk memory percakapan (opsional)' },
+    ],
   },
   {
     slug:     'deepseek',
