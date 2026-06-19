@@ -16,6 +16,7 @@ import aiGemini,      { meta as metaGemini }    from './routes/ai-chat/gemini'
 import aiLlama4,      { meta as metaLlama4 }    from './routes/ai-chat/llama4' 
 import aiclaude35,    { meta as metaClaude35 }  from './routes/ai-chat/claude3.5'
 import aiQwen3next,   { meta as metaQwen3next } from './routes/ai-chat/qwen3next'
+import aiCopilot,     { meta as metaCopilot }   from './routes/ai-chat/copilot'
 
 //======= Tools =======//
 import dlTiktok,      { meta as metaTiktok }    from './routes/downloader/tiktok'
@@ -44,6 +45,7 @@ app.route('/api/ai-chat/gemini',    aiGemini)
 app.route('/api/ai-chat/llama4',    aiLlama4) 
 app.route('/api/ai-chat/claude3.5', aiclaude35) 
 app.route('/api/ai-chat/qwen3next', aiQwen3next)
+app.route('/api/ai-chat/copilot',   aiCopilot)
 
 // Routes Tools
 app.route('/api/downloader/tiktok', dlTiktok)
@@ -63,6 +65,7 @@ const ALL_META = [
   { path: '/api/ai-chat/llama4',     ...metaLlama4 },
   { path: '/api/ai-chat/claude3.5',  ...metaClaude35 },
   { path: '/api/ai-chat/qwen3next',  ...metaQwen3next },
+  { path: '/api/ai-chat/copilot',    ...metaCopilot },
   { path: '/api/downloader/tiktok',  ...metaTiktok },
   { path: '/api/downloader/youtube', ...metaYoutube },
   { path: '/api/tools/ssweb',        ...metaSsweb },
