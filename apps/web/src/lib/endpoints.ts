@@ -68,7 +68,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     {
     slug: 'claude3.5', 
     category: 'AI CHAT', 
-    name: 'Overchat AI',
+    name: 'Claude 3.5 Sonnet',
     desc: 'Chat dengan Claude 3.5 Sonnet via Overchat AI. Support session/memory.',
     path: '/api/ai-chat/claude3.5', method: 'GET',
     params: [
