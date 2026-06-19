@@ -23,7 +23,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     method:   'GET',
     params:   [
       { name: 'query',  type: 'query', required: true,  description: 'Pertanyaan ke DeepSeek' },
-      { name: 'system', type: 'query', required: false, description: 'System prompt custom' },
+      { name: 'model', type: 'query', required: false, description: 'Pilihan model: "v4-flash" atau "r1" (default: v4-flash)' },
     ],
   },
   {
