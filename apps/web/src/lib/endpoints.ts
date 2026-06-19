@@ -54,7 +54,8 @@ export const ENDPOINTS: EndpointDoc[] = [
   params:   [
     { name: 'query',   type: 'query', required: true,  description: 'Pertanyaan atau pesan untuk Gemini' },
     { name: 'session', type: 'query', required: false, description: 'Nama session untuk memory percakapan (opsional)' },
-  }, 
+  ],
+},
   {
     slug:     'tiktok',
     category: 'DOWNLOADER',
