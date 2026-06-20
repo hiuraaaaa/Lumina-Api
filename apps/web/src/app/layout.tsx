@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/context/AuthContext'
 import SiteHeader from '@/components/layout/SiteHeader'
+import AuthGate from '@/components/layout/AuthGate'
 
 export const metadata: Metadata = {
   title: { default: 'Lumina API', template: '%s | Lumina API' },
@@ -39,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <AuthProvider>
           <SiteHeader />
-          {children}
+          <AuthGate>{children}</AuthGate>
         </AuthProvider>
       </body>
     </html>

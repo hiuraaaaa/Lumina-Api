@@ -156,6 +156,14 @@ export default function HomePage() {
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
+            {!loading && user && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+                style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.62rem', color: 'var(--muted)' }}
+              >
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', display: 'inline-block', flexShrink: 0 }} />
+                {user.email}
+              </motion.div>
+            )}
             {[
               { href: '#cats', label: 'Endpoints' },
               { href: '/docs', label: 'Docs' },
@@ -195,6 +203,12 @@ export default function HomePage() {
           <li><a href="#cats">Endpoints</a></li>
           <li><Link href="/docs">Docs</Link></li>
           <li><Link href="/playground">Playground</Link></li>
+          {!loading && user && (
+            <li style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.66rem', color: 'var(--muted)' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', display: 'inline-block', flexShrink: 0 }} />
+              {user.email}
+            </li>
+          )}
           {!loading && user && <li><Link href="/dashboard">Dashboard</Link></li>}
           {!loading && !user && <li><Link href="/login">Login</Link></li>}
           {!loading && user && (
