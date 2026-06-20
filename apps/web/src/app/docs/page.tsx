@@ -268,6 +268,61 @@ export default function DocsPage() {
               </motion.div>
             </div>
 
+            {/* getting started / auth guide */}
+            <div style={{ padding: '0 clamp(1rem, 4vw, 2.5rem)', marginBottom: '1rem' }}>
+              <div style={{
+                border: '1px solid var(--border)', background: 'var(--surface)',
+                padding: 'clamp(1.2rem, 3vw, 1.8rem)',
+              }}>
+                <h2 style={{
+                  fontFamily: "'Syne', sans-serif", fontWeight: 700,
+                  fontSize: '1.1rem', marginBottom: '.5rem',
+                }}>
+                  Cara Pakai API Key
+                </h2>
+                <p style={{ fontSize: '.74rem', color: 'var(--muted)', lineHeight: 1.7, marginBottom: '1.2rem', maxWidth: 640 }}>
+                  Semua endpoint butuh API key. Tanpa key, kamu tetap bisa coba tapi limitnya
+                  cuma <b style={{ color: 'var(--text)' }}>20 request/menit</b>. Pakai key gratis,
+                  limit naik jadi <b style={{ color: 'var(--text)' }}>100 request/menit</b>.
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <Step n={1} title="Login & buat key">
+                    Buka <Link href="/login" style={{ color: 'var(--accent)' }}>halaman login</Link>,
+                    masuk pakai email atau Google, terus generate API key gratis di{' '}
+                    <Link href="/dashboard" style={{ color: 'var(--accent)' }}>dashboard</Link>.
+                    Key cuma ditampilin sekali pas dibuat — langsung disalin & disimpan.
+                  </Step>
+
+                  <Step n={2} title="Tempelin di header x-api-key">
+                    Kirim key itu di setiap request lewat header <code style={inlineCode}>x-api-key</code>.
+                    <div style={{ marginTop: '.6rem' }}>
+                      <CodeBlock label="cURL">
+{`curl "${apiBase}/api/ai-chat/lumina?query=halo" \\
+  -H "x-api-key: lumina-xxxxxxxxxxxx"`}
+                      </CodeBlock>
+                    </div>
+                    <div style={{ marginTop: '.6rem' }}>
+                      <CodeBlock label="JavaScript (fetch)">
+{`fetch("${apiBase}/api/ai-chat/lumina?query=halo", {
+  headers: { "x-api-key": "lumina-xxxxxxxxxxxx" }
+})
+  .then(res => res.json())
+  .then(console.log)`}
+                      </CodeBlock>
+                    </div>
+                  </Step>
+
+                  <Step n={3} title="Browsing di web Lumina sendiri">
+                    Khusus di Playground & tombol "Try It" di halaman ini — kalau kamu udah{' '}
+                    <Link href="/login" style={{ color: 'var(--accent)' }}>login</Link>, key-nya
+                    otomatis terpasang, gak perlu copy-paste manual. API key cuma wajib ditempel
+                    manual kalau manggil dari luar web ini (curl, aplikasi sendiri, bot, dst).
+                  </Step>
+                </div>
+              </div>
+            </div>
+
             {/* endpoint sections */}
             <div style={{ padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2.5rem)' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
@@ -369,4 +424,48 @@ export default function DocsPage() {
       </main>
     </>
   )
+}
+
+function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', gap: '.9rem' }}>
+      <div style={{
+        flexShrink: 0, width: 24, height: 24, borderRadius: '50%',
+        border: '1px solid var(--accent)', color: 'var(--accent)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: '.68rem', fontFamily: "'DM Mono', monospace", fontWeight: 700,
+      }}>
+        {n}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: '.8rem', fontWeight: 600, marginBottom: '.35rem' }}>{title}</p>
+        <div style={{ fontSize: '.74rem', color: 'var(--muted)', lineHeight: 1.7 }}>{children}</div>
+      </div>
+    </div>
+  )
+}
+
+function CodeBlock({ label, children }: { label: string; children: string }) {
+  return (
+    <div style={{ border: '1px solid var(--border)', background: 'var(--bg2)' }}>
+      <div style={{
+        padding: '.4rem .8rem', fontSize: '.6rem', textTransform: 'uppercase',
+        letterSpacing: '.08em', color: 'var(--muted)', borderBottom: '1px solid var(--border)',
+      }}>
+        {label}
+      </div>
+      <pre style={{
+        margin: 0, padding: '.8rem', fontSize: '.68rem', fontFamily: "'DM Mono', monospace",
+        color: 'var(--text)', overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: 1.6,
+      }}>
+        {children}
+      </pre>
+    </div>
+  )
+}
+
+const inlineCode: React.CSSProperties = {
+  fontFamily: "'DM Mono', monospace", fontSize: '.7rem',
+  background: 'var(--bg2)', border: '1px solid var(--border)',
+  padding: '.1rem .4rem',
 }
