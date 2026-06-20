@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { ENDPOINTS, CATEGORIES } from '@/lib/endpoints'
+import { ProviderIcon } from '@/components/ui/ProviderIcon'
 import { useAuth } from '@/context/AuthContext'
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -35,16 +36,8 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   ),
 }
 
-const TICKER_ITEMS = [
-  'AI Chat · Lumina & Deepseek',
-  'TikTok Downloader',
-  'YouTube Downloader',
-  'Anime Search & Schedule',
-  'Screenshot Website',
-  'Genius Lyrics',
-  'No Registration Required',
-  '60 req/min · Free Forever',
-]
+// daftar AI chat dari data endpoints, dipakai di ticker hero
+const AI_CHAT_ENDPOINTS = ENDPOINTS.filter(e => e.category === 'AI CHAT')
 
 // reusable fade-up variant
 const fadeUp = {
@@ -342,9 +335,10 @@ export default function HomePage() {
       {/* ticker */}
       <div className="ticker-wrap">
         <div className="ticker-inner">
-          {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
+          {[...AI_CHAT_ENDPOINTS, ...AI_CHAT_ENDPOINTS].map((ep, i) => (
             <span key={i} className="tick-item">
-              <span className="tick-dot" />{item}
+              <ProviderIcon slug={ep.slug} size={14} />
+              {ep.name}
             </span>
           ))}
         </div>
