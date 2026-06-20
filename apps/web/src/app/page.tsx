@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { ENDPOINTS, CATEGORIES } from '@/lib/endpoints'
+import { useAuth } from '@/context/AuthContext'
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'AI CHAT': (
@@ -78,6 +80,8 @@ export default function HomePage() {
   const progRef = useRef<HTMLDivElement>(null)
   const navRef  = useRef<HTMLElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const { user, loading, logout } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     const cur  = curRef.current
@@ -152,7 +156,13 @@ export default function HomePage() {
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
-            {['#cats', '/docs', '/playground'].map((href, i) => (
+            {[
+              { href: '#cats', label: 'Endpoints' },
+              { href: '/docs', label: 'Docs' },
+              { href: '/playground', label: 'Playground' },
+              ...(!loading && user ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
+              ...(!loading && !user ? [{ href: '/login', label: 'Login' }] : []),
+            ].map(({ href, label }, i) => (
               <motion.div
                 key={href}
                 initial={{ opacity: 0, y: 20 }}
@@ -160,10 +170,20 @@ export default function HomePage() {
                 transition={{ delay: i * 0.07 + 0.1 }}
               >
                 <Link href={href} onClick={() => setMenuOpen(false)}>
-                  {['Endpoints', 'Docs', 'Playground'][i]}
+                  {label}
                 </Link>
               </motion.div>
             ))}
+            {!loading && user && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+                <button
+                  onClick={() => { setMenuOpen(false); logout().then(() => router.push('/')) }}
+                  style={{ background: 'none', border: 'none', font: 'inherit', color: 'inherit', padding: 0, cursor: 'pointer' }}
+                >
+                  Keluar
+                </button>
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -175,6 +195,18 @@ export default function HomePage() {
           <li><a href="#cats">Endpoints</a></li>
           <li><Link href="/docs">Docs</Link></li>
           <li><Link href="/playground">Playground</Link></li>
+          {!loading && user && <li><Link href="/dashboard">Dashboard</Link></li>}
+          {!loading && !user && <li><Link href="/login">Login</Link></li>}
+          {!loading && user && (
+            <li>
+              <button
+                onClick={() => logout().then(() => router.push('/'))}
+                style={{ background: 'none', border: 'none', font: 'inherit', color: 'inherit', padding: 0, cursor: 'pointer' }}
+              >
+                Keluar
+              </button>
+            </li>
+          )}
         </ul>
         <button
           className={`hamburger ${menuOpen ? 'open' : ''}`}
