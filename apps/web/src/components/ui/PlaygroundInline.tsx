@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import type { EndpointDoc } from '@lumina/types'
+import { useAuth } from '@/context/AuthContext'
 
 interface Props {
   endpoint: EndpointDoc
@@ -9,6 +11,7 @@ interface Props {
 }
 
 export default function PlaygroundInline({ endpoint, apiBase }: Props) {
+  const { user, loading: authLoading, getToken } = useAuth()
   const [values,   setValues]   = useState<Record<string, string>>({})
   const [loading,  setLoading]  = useState(false)
   const [response, setResponse] = useState<string | null>(null)
@@ -22,7 +25,12 @@ export default function PlaygroundInline({ endpoint, apiBase }: Props) {
         Object.fromEntries(Object.entries(values).filter(([, v]) => v))
       ).toString()
       const url = `${apiBase}${endpoint.path}${qs ? '?' + qs : ''}`
-      const res = await fetch(url, { method: endpoint.method })
+      const headers: Record<string, string> = {}
+      if (user) {
+        const token = await getToken()
+        if (token) headers.Authorization = `Bearer ${token}`
+      }
+      const res = await fetch(url, { method: endpoint.method, headers })
       const data = await res.json()
       setStatus(res.status)
       setResponse(JSON.stringify(data, null, 2))
@@ -42,6 +50,18 @@ export default function PlaygroundInline({ endpoint, apiBase }: Props) {
       background: 'var(--surface)',
       overflow: 'hidden',
     }}>
+      {!authLoading && !user && (
+        <div style={{
+          padding: '.8rem 1.2rem', borderBottom: '1px solid var(--border)',
+          fontSize: '.66rem', color: 'var(--muted)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.8rem', flexWrap: 'wrap',
+        }}>
+          <span>Semua endpoint butuh API key. Login dulu biar bisa coba langsung di sini.</span>
+          <Link href="/login" className="btn-ghost" style={{ fontSize: '.62rem', padding: '.35rem .7rem', flexShrink: 0 }}>
+            <span>Login</span>
+          </Link>
+        </div>
+      )}
       {/* inputs */}
       {endpoint.params.length > 0 && (
         <div style={{
