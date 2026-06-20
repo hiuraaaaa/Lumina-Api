@@ -1,5 +1,6 @@
 import type { MiddlewareHandler } from 'hono'
 import { cache } from '../lib/cache'
+import { db, fbAdmin } from '../lib/firebase'
 
 // Semua endpoint /api/* sekarang wajib API key (atau session key hasil
 // resolveApiKeyMiddleware kalau diakses dari web sendiri pas login).
@@ -19,5 +20,10 @@ export const authMiddleware: MiddlewareHandler = async (c, next) => {
       401,
     )
   }
+  // Catat pemakaian key, fire-and-forget biar gak nambah latency.
+  db.collection('apikeys').doc(apikey).update({
+    requestCount: fbAdmin.firestore.FieldValue.increment(1),
+    lastUsedAt:   fbAdmin.firestore.FieldValue.serverTimestamp(),
+  }).catch(() => {})
   await next()
 }

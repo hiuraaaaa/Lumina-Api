@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { AuthProvider } from '@/context/AuthContext'
+import SiteHeader from '@/components/layout/SiteHeader'
 
 export const metadata: Metadata = {
   title: { default: 'Lumina API', template: '%s | Lumina API' },
@@ -35,7 +37,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className="min-h-screen antialiased"
         style={{ fontFamily: "'DM Mono', monospace", background: 'var(--bg)', color: 'var(--text)' }}
       >
-        {children}
+        <AuthProvider>
+          <SiteHeader />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )

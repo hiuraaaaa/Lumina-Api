@@ -4,20 +4,20 @@ import { z } from 'zod'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
-import type { ChatResponse, RouteDefinition } from '../../lib/types'
+import type { ApiResponse, ChatResponse, RouteDefinition } from '../../lib/types'
 
 export const meta: RouteDefinition = {
-  name: 'Ai Lumina',
-  desc: 'Chat dengan AI core pintar asisten resmi dari Perusahaan Lunar. Support session/memory.',
+  name: 'Claude3.5 Sonnet',
+  desc: 'Chat dengan Claude 3.5 Sonnet via Overchat AI. Support session/memory.',
   category: 'AI CHAT',
   params: ['query', 'session'],
   method: 'GET'
 }
 
 const API = 'https://api.overchat.ai/v1/chat/completions'
-const CORE_MODEL = 'claude-haiku-4-5-20251001'
+const MODEL = 'claude-haiku-4-5-20251001'
+const SESSION_DIR = path.join('/tmp', 'overchat-sessions');
 
-const SESSION_DIR = path.join('/tmp', 'lunar-lumina-sessions')
 if (!fs.existsSync(SESSION_DIR)) {
   fs.mkdirSync(SESSION_DIR, { recursive: true })
 }
@@ -32,19 +32,17 @@ const UAS = [
 const pick = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)]
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
 
-function clean(t: string): string {
-  return (t || '')
-    .replace(/\*\*/g, '')
-    .replace(/\*/g, '')
-    .replace(/__/g, '')
-    .replace(/_/g, '')
-    .replace(/`/g, '')
-    .replace(/\\n/g, ' ')
-    .replace(/\n+/g, ' ')
-    .replace(/\t+/g, ' ')
-    .replace(/ +/g, ' ')
-    .trim()
-}
+const clean = (t: string) => (t || '')
+  .replace(/\*\*/g, '')
+  .replace(/\*/g, '')
+  .replace(/__/g, '')
+  .replace(/_/g, '')
+  .replace(/`/g, '')
+  .replace(/\\n/g, ' ')
+  .replace(/\n+/g, ' ')
+  .replace(/\t+/g, ' ')
+  .replace(/  +/g, ' ')
+  .trim()
 
 function handleSession(name: string = 'default') {
   const file = path.join(SESSION_DIR, `${name}.json`)
@@ -65,7 +63,7 @@ function handleSession(name: string = 'default') {
   }
 }
 
-async function luminaChat(prompt: string, sessionName: string = 'default'): Promise<string> {
+async function overchat(prompt: string, sessionName: string = 'default'): Promise<string> {
   await sleep(100 + Math.random() * 500)
   const session = handleSession(sessionName)
   
@@ -75,7 +73,7 @@ async function luminaChat(prompt: string, sessionName: string = 'default'): Prom
     { 
       id: crypto.randomUUID(), 
       role: 'system', 
-      content: 'Kamu adalah Ai Lumina dari Perusahaan Lunar. Jawab dengan bahasa natural, singkat, dan jelas. Jangan gunakan markdown, asterik, atau formatting apapun. Jangan gunakan emoji.' 
+      content: 'Jawab dengan bahasa natural, singkat, dan jelas. Jangan gunakan markdown, asterik, atau formatting apapun. Jangan gunakan emoji.' 
     }
   ]
 
@@ -98,7 +96,7 @@ async function luminaChat(prompt: string, sessionName: string = 'default'): Prom
     },
     body: JSON.stringify({
       chatId: session.data.chatId,
-      model: CORE_MODEL,
+      model: MODEL,
       messages,
       personaId: 'claude-haiku-4-5-landing',
       frequency_penalty: 0,
@@ -142,11 +140,11 @@ async function luminaChat(prompt: string, sessionName: string = 'default'): Prom
     }
   }
 
-  const finalAnswer = clean(answer)
+  answer = clean(answer)
   
   session.data.messages.push(
     { id: crypto.randomUUID(), role: 'user', content: prompt },
-    { id: crypto.randomUUID(), role: 'assistant', content: finalAnswer }
+    { id: crypto.randomUUID(), role: 'assistant', content: answer }
   )
 
   if (session.data.messages.length > 20) {
@@ -154,7 +152,7 @@ async function luminaChat(prompt: string, sessionName: string = 'default'): Prom
   }
 
   session.save(session.data)
-  return finalAnswer
+  return answer
 }
 
 const app = new Hono()
@@ -168,7 +166,7 @@ app.get('/', zValidator('query', schema), async (c) => {
   const { query, session } = c.req.valid('query')
   
   try {
-    const reply = await luminaChat(query, session)
+    const reply = await overchat(query, session)
     
     return c.json({
       status: true,
@@ -176,7 +174,7 @@ app.get('/', zValidator('query', schema), async (c) => {
       creator: 'Xena',
       result: {
         reply,
-        model: 'Ai Lumina Core v1',
+        model: 'Claude Claude3.5 Sonnet',
         session: session || 'default'
       } as ChatResponse & { session: string }
     })
@@ -191,3 +189,4 @@ app.get('/', zValidator('query', schema), async (c) => {
 })
 
 export default app
+

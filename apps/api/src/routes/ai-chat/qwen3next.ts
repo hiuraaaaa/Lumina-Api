@@ -4,20 +4,21 @@ import { z } from 'zod'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
-import type { ChatResponse, RouteDefinition } from '../../lib/types'
+import type { ApiResponse, ChatResponse, RouteDefinition } from '../../lib/types'
 
 export const meta: RouteDefinition = {
-  name: 'Ai Lumina',
-  desc: 'Chat dengan AI core pintar asisten resmi dari Perusahaan Lunar. Support session/memory.',
+  name: 'Qwen 3 Next AI',
+  desc: 'Chat dengan Qwen 3 Next 80B via Overchat API. Support session/memory.',
   category: 'AI CHAT',
   params: ['query', 'session'],
   method: 'GET'
 }
 
 const API = 'https://api.overchat.ai/v1/chat/completions'
-const CORE_MODEL = 'claude-haiku-4-5-20251001'
+const MODEL = 'alibaba/qwen3-next-80b-a3b-instruct'
+const PERSONA_ID = 'qwen-3-landing'
 
-const SESSION_DIR = path.join('/tmp', 'lunar-lumina-sessions')
+const SESSION_DIR = path.join('/tmp', 'qwen3-sessions')
 if (!fs.existsSync(SESSION_DIR)) {
   fs.mkdirSync(SESSION_DIR, { recursive: true })
 }
@@ -31,20 +32,6 @@ const UAS = [
 
 const pick = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)]
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
-
-function clean(t: string): string {
-  return (t || '')
-    .replace(/\*\*/g, '')
-    .replace(/\*/g, '')
-    .replace(/__/g, '')
-    .replace(/_/g, '')
-    .replace(/`/g, '')
-    .replace(/\\n/g, ' ')
-    .replace(/\n+/g, ' ')
-    .replace(/\t+/g, ' ')
-    .replace(/ +/g, ' ')
-    .trim()
-}
 
 function handleSession(name: string = 'default') {
   const file = path.join(SESSION_DIR, `${name}.json`)
@@ -65,7 +52,7 @@ function handleSession(name: string = 'default') {
   }
 }
 
-async function luminaChat(prompt: string, sessionName: string = 'default'): Promise<string> {
+async function qwenChat(prompt: string, sessionName: string = 'default'): Promise<string> {
   await sleep(100 + Math.random() * 500)
   const session = handleSession(sessionName)
   
@@ -75,7 +62,7 @@ async function luminaChat(prompt: string, sessionName: string = 'default'): Prom
     { 
       id: crypto.randomUUID(), 
       role: 'system', 
-      content: 'Kamu adalah Ai Lumina dari Perusahaan Lunar. Jawab dengan bahasa natural, singkat, dan jelas. Jangan gunakan markdown, asterik, atau formatting apapun. Jangan gunakan emoji.' 
+      content: 'Ikuti bahasa user dan jawab dengan gaya natural, singkat, dan jelas.' 
     }
   ]
 
@@ -98,9 +85,9 @@ async function luminaChat(prompt: string, sessionName: string = 'default'): Prom
     },
     body: JSON.stringify({
       chatId: session.data.chatId,
-      model: CORE_MODEL,
+      model: MODEL,
       messages,
-      personaId: 'claude-haiku-4-5-landing',
+      personaId: PERSONA_ID,
       frequency_penalty: 0,
       max_tokens: 4000,
       presence_penalty: 0,
@@ -142,7 +129,7 @@ async function luminaChat(prompt: string, sessionName: string = 'default'): Prom
     }
   }
 
-  const finalAnswer = clean(answer)
+  const finalAnswer = answer.trim()
   
   session.data.messages.push(
     { id: crypto.randomUUID(), role: 'user', content: prompt },
@@ -168,7 +155,7 @@ app.get('/', zValidator('query', schema), async (c) => {
   const { query, session } = c.req.valid('query')
   
   try {
-    const reply = await luminaChat(query, session)
+    const reply = await qwenChat(query, session)
     
     return c.json({
       status: true,
@@ -176,7 +163,7 @@ app.get('/', zValidator('query', schema), async (c) => {
       creator: 'Xena',
       result: {
         reply,
-        model: 'Ai Lumina Core v1',
+        model: 'Qwen 3 Next 80B',
         session: session || 'default'
       } as ChatResponse & { session: string }
     })

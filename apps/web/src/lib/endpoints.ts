@@ -9,10 +9,13 @@ export const ENDPOINTS: EndpointDoc[] = [
     slug:     'lumina',
     category: 'AI CHAT',
     name:     'LuminaAI',
-    desc:     'Chat dengan Lumina AI (Original Persona) via Overchat Engine.',
+    desc:     'Asisten pintar Ai Lumina yang dikembangkan resmi oleh Perusahaan Lunar.',
     path:     '/api/ai-chat/lumina',
     method:   'GET',
-    params:   [{ name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Lumina AI' }],
+    params:   [
+      { name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Lumina AI' }, 
+      { name: 'session', type: 'query', required: false, description: 'Nama session untuk memory percakapan (opsional)' },
+    ],
   },
   {
     slug:     'deepseek',
@@ -23,7 +26,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     method:   'GET',
     params:   [
       { name: 'query',  type: 'query', required: true,  description: 'Pertanyaan ke DeepSeek' },
-      { name: 'system', type: 'query', required: false, description: 'System prompt custom' },
+      { name: 'model', type: 'query', required: false, description: 'Pilihan model: "v4-flash" atau "r1" (default: v4-flash)' },
     ],
   },
   {
@@ -43,6 +46,50 @@ export const ENDPOINTS: EndpointDoc[] = [
     path:     '/api/ai-chat/gita',
     method:   'GET',
     params:   [{ name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Gita AI' }],
+  },
+  {
+  slug:     'gemini',
+  category: 'AI CHAT',
+  name:     'Gemini AI',
+  desc:     'Chat dengan Google Gemini AI tanpa API key. Support session/memory percakapan.',
+  path:     '/api/ai-chat/gemini',
+  method:   'GET',
+  params:   [
+    { name: 'query',   type: 'query', required: true,  description: 'Pertanyaan atau pesan untuk Gemini' },
+    { name: 'session', type: 'query', required: false, description: 'Nama session untuk memory percakapan (opsional)' },
+    ],
+   },
+    {
+    slug: 'llama4', 
+    category: 'AI CHAT', 
+    name: 'Llama 4 Scout AI',
+    desc: 'Chat dengan Llama 4 Scout 17B tanpa API key.',
+    path: '/api/ai-chat/llama4', 
+    method: 'GET',
+    params: [{ name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Llama 4 Scout' }],
+  },
+    {
+    slug: 'claude3.5', 
+    category: 'AI CHAT', 
+    name: 'Claude 3.5 Sonnet',
+    desc: 'Chat dengan Claude 3.5 Sonnet via Overchat AI. Support session/memory.',
+    path: '/api/ai-chat/claude3.5', method: 'GET',
+    params: [
+      { name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk AI' },
+      { name: 'session', type: 'query', required: false, description: 'Nama session memory (opsional)' }, 
+    ],
+  },
+  {
+  slug: 'copilot',
+  category: 'AI CHAT',
+  name: 'Microsoft Copilot',
+  desc: 'Chat dengan AI Copilot. Mendukung model Default, Think Deeper (Reasoning), dan GPT-5.',
+  path: '/api/ai-chat/copilot',
+  method: 'GET',
+  params: [
+    { name: 'query', type: 'query', required: true, description: 'Pertanyaan atau pesan untuk Copilot' }, 
+    { name: 'model', type: 'query', required: false, description: 'Pilihan model: "default", "think-deeper", atau "gpt-5"' }, 
+    ],
   },
   {
     slug:     'tiktok',
