@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { ENDPOINTS, CATEGORIES } from '@/lib/endpoints'
+import { useAuth } from '@/context/AuthContext'
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'AI CHAT': (
@@ -78,6 +80,8 @@ export default function HomePage() {
   const progRef = useRef<HTMLDivElement>(null)
   const navRef  = useRef<HTMLElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const { user, loading, logout } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     const cur  = curRef.current
@@ -152,7 +156,13 @@ export default function HomePage() {
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
-            {['#cats', '/docs', '/playground'].map((href, i) => (
+            {[
+              { href: '#cats', label: 'Endpoints' },
+              { href: '/docs', label: 'Docs' },
+              { href: '/playground', label: 'Playground' },
+              ...(!loading && user ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
+              ...(!loading && !user ? [{ href: '/login', label: 'Login' }] : []),
+            ].map(({ href, label }, i) => (
               <motion.div
                 key={href}
                 initial={{ opacity: 0, y: 20 }}
@@ -160,10 +170,20 @@ export default function HomePage() {
                 transition={{ delay: i * 0.07 + 0.1 }}
               >
                 <Link href={href} onClick={() => setMenuOpen(false)}>
-                  {['Endpoints', 'Docs', 'Playground'][i]}
+                  {label}
                 </Link>
               </motion.div>
             ))}
+            {!loading && user && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+                <button
+                  onClick={() => { setMenuOpen(false); logout().then(() => router.push('/')) }}
+                  style={{ background: 'none', border: 'none', font: 'inherit', color: 'inherit', padding: 0, cursor: 'pointer' }}
+                >
+                  Keluar
+                </button>
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -175,6 +195,18 @@ export default function HomePage() {
           <li><a href="#cats">Endpoints</a></li>
           <li><Link href="/docs">Docs</Link></li>
           <li><Link href="/playground">Playground</Link></li>
+          {!loading && user && <li><Link href="/dashboard">Dashboard</Link></li>}
+          {!loading && !user && <li><Link href="/login">Login</Link></li>}
+          {!loading && user && (
+            <li>
+              <button
+                onClick={() => logout().then(() => router.push('/'))}
+                style={{ background: 'none', border: 'none', font: 'inherit', color: 'inherit', padding: 0, cursor: 'pointer' }}
+              >
+                Keluar
+              </button>
+            </li>
+          )}
         </ul>
         <button
           className={`hamburger ${menuOpen ? 'open' : ''}`}
@@ -200,7 +232,7 @@ export default function HomePage() {
           >
             <motion.div className="chip" variants={fadeUp} transition={{ duration: 0.5, ease: 'easeOut' }}>
               <div className="chip-dot" />
-              <span className="chip-text"><b>{ENDPOINTS.length}+ endpoints</b> · no auth</span>
+              <span className="chip-text"><b>{ENDPOINTS.length}+ endpoints</b> · gratis pakai key</span>
             </motion.div>
 
             <motion.h1
@@ -267,12 +299,12 @@ export default function HomePage() {
             <div className="irow">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
               <span className="ilabel">rate limit</span>
-              <span className="ival">60 req / min</span>
+              <span className="ival">20/min gratis · 100/min dengan key</span>
             </div>
             <div className="irow">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               <span className="ilabel">auth</span>
-              <span className="ival">tidak perlu</span>
+              <span className="ival">API key (gratis, login dulu)</span>
             </div>
             <div className="irow">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
@@ -379,9 +411,10 @@ export default function HomePage() {
         <div className="cta-orb" />
         <RevealSection>
           <h2 className="cta-title">Mulai<br /><span className="serif">sekarang</span></h2>
-          <p className="cta-sub">tidak perlu daftar. tidak perlu api key. langsung request.</p>
+          <p className="cta-sub">login gratis. buat api key. langsung request.</p>
           <div className="cta-btns">
-            <Link href="/docs"       className="btn-primary"><span>Baca Dokumentasi</span></Link>
+            <Link href="/login"      className="btn-primary"><span>Login & Buat Key</span></Link>
+            <Link href="/docs"       className="btn-ghost"><span>Baca Dokumentasi</span></Link>
             <Link href="/playground" className="btn-ghost"><span>Coba Playground</span></Link>
           </div>
         </RevealSection>

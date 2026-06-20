@@ -3,11 +3,14 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ENDPOINTS, CATEGORIES } from '@/lib/endpoints'
+import { ProviderIcon } from '@/components/ui/ProviderIcon'
+import { useAuth } from '@/context/AuthContext'
 import type { EndpointDoc } from '@lumina/types'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.lumina.vercel.app'
 
 export default function PlaygroundPage() {
+  const { user, loading: authLoading, getToken } = useAuth()
   const [selected, setSelected] = useState<EndpointDoc>(ENDPOINTS[0])
   const [values,   setValues]   = useState<Record<string, string>>({})
   const [loading,  setLoading]  = useState(false)
@@ -31,7 +34,12 @@ export default function PlaygroundPage() {
     try {
       const qs  = new URLSearchParams(Object.fromEntries(Object.entries(values).filter(([, v]) => v))).toString()
       const url = `${API_BASE}${selected.path}${qs ? '?' + qs : ''}`
-      const res = await fetch(url, { method: selected.method })
+      const headers: Record<string, string> = {}
+      if (user) {
+        const token = await getToken()
+        if (token) headers.Authorization = `Bearer ${token}`
+      }
+      const res = await fetch(url, { method: selected.method, headers })
       setStatus(res.status)
       setResponse(JSON.stringify(await res.json(), null, 2))
     } catch (e: any) {
@@ -122,6 +130,7 @@ export default function PlaygroundPage() {
                     }}>
                       {ep.method}
                     </span>
+                    {ep.category === 'AI CHAT' && <ProviderIcon slug={ep.slug} size={14} />}
                     <span style={{ lineHeight: 1.3 }}>{ep.name}</span>
                   </button>
                 )
@@ -237,7 +246,8 @@ export default function PlaygroundPage() {
             }}>
               {selected.method}
             </span>
-            <span style={{ fontSize: '.72rem', fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>
+            <span style={{ fontSize: '.72rem', fontFamily: "'Syne', sans-serif", fontWeight: 700, display: 'flex', alignItems: 'center', gap: '.4rem' }}>
+              {selected.category === 'AI CHAT' && <ProviderIcon slug={selected.slug} size={13} />}
               {selected.name}
             </span>
           </div>
@@ -270,7 +280,9 @@ export default function PlaygroundPage() {
                 fontFamily: "'Syne', sans-serif", fontWeight: 800,
                 fontSize: 'clamp(1.4rem, 4vw, 2rem)',
                 letterSpacing: '-.04em', marginBottom: '.4rem',
+                display: 'flex', alignItems: 'center', gap: '.55rem',
               }}>
+                {selected.category === 'AI CHAT' && <ProviderIcon slug={selected.slug} size={22} />}
                 {selected.name}
               </h2>
               <p style={{ fontSize: '.75rem', color: 'var(--muted)', lineHeight: 1.6 }}>{selected.desc}</p>
@@ -314,6 +326,19 @@ export default function PlaygroundPage() {
                     />
                   </div>
                 ))}
+              </div>
+            )}
+
+            {!authLoading && !user && (
+              <div style={{
+                border: '1px solid var(--border)', background: 'var(--surface)',
+                padding: '.8rem 1rem', marginBottom: '1rem', fontSize: '.68rem',
+                color: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.8rem', flexWrap: 'wrap',
+              }}>
+                <span>Semua endpoint sekarang butuh API key. Login dulu biar bisa langsung coba di sini tanpa nempel key manual.</span>
+                <Link href="/login" className="btn-ghost" style={{ fontSize: '.65rem', padding: '.4rem .8rem', flexShrink: 0 }}>
+                  <span>Login</span>
+                </Link>
               </div>
             )}
 
