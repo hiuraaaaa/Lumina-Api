@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ENDPOINTS, CATEGORIES } from '@/lib/endpoints'
+import { ProviderIcon } from '@/components/ui/ProviderIcon'
 
 const CAT_ICONS: Record<string, React.ReactNode> = {
   'AI CHAT': (
@@ -340,7 +341,9 @@ export default function DocsPage() {
                                   fontFamily: "'Syne', sans-serif", fontWeight: 600,
                                   fontSize: '.85rem', color: 'var(--text)',
                                   transition: 'color .25s', marginBottom: '.2rem',
+                                  display: 'flex', alignItems: 'center', gap: '.4rem',
                                 }}>
+                                  {ep.category === 'AI CHAT' && <ProviderIcon slug={ep.slug} size={15} />}
                                   {ep.name}
                                 </div>
                                 <div style={{ fontSize: '.68rem', color: 'var(--muted)', lineHeight: 1.6 }}>
