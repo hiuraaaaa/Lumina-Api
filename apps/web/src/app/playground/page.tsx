@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ENDPOINTS, CATEGORIES } from '@/lib/endpoints'
 import { ProviderIcon } from '@/components/ui/ProviderIcon'
+import ChatPanel from '@/components/ui/ChatPanel'
 import { useAuth } from '@/context/AuthContext'
 import type { EndpointDoc } from '@lumina/types'
 
@@ -288,47 +289,6 @@ export default function PlaygroundPage() {
               <p style={{ fontSize: '.75rem', color: 'var(--muted)', lineHeight: 1.6 }}>{selected.desc}</p>
             </div>
 
-            {/* params */}
-            {selected.params.length > 0 && (
-              <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
-                {selected.params.map(p => (
-                  <div key={p.name}>
-                    <label style={{
-                      display: 'block', marginBottom: '.35rem',
-                      fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase',
-                      color: 'var(--muted)', fontFamily: "'DM Mono', monospace",
-                    }}>
-                      {p.name}
-                      {p.required && <span style={{ color: '#f87171', marginLeft: '.3rem' }}>*</span>}
-                      {p.description && (
-                        <span style={{ opacity: .6, marginLeft: '.5rem', textTransform: 'none', letterSpacing: 0 }}>
-                          — {p.description}
-                        </span>
-                      )}
-                    </label>
-                    <input
-                      type="text"
-                      placeholder={p.description ?? p.name}
-                      value={values[p.name] ?? ''}
-                      onChange={e => setValues(prev => ({ ...prev, [p.name]: e.target.value }))}
-                      style={{
-                        width: '100%', boxSizing: 'border-box',
-                        background: 'rgba(255,255,255,.04)',
-                        border: '1px solid var(--border)',
-                        padding: '.65rem .85rem',
-                        fontFamily: "'DM Mono', monospace",
-                        fontSize: '.72rem', color: 'var(--text)',
-                        outline: 'none', minHeight: 44,
-                        transition: 'border-color .2s',
-                      }}
-                      onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-                      onBlur={e  => (e.target.style.borderColor = 'var(--border)')}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
             {!authLoading && !user && (
               <div style={{
                 border: '1px solid var(--border)', background: 'var(--surface)',
@@ -342,69 +302,121 @@ export default function PlaygroundPage() {
               </div>
             )}
 
-            {/* send */}
-            <button
-              onClick={handleSend}
-              disabled={loading}
-              style={{
-                width: '100%', minHeight: 50,
-                background: loading ? 'var(--surface)' : 'var(--accent)',
-                color: loading ? 'var(--muted)' : 'var(--bg)',
-                border: '1px solid ' + (loading ? 'var(--border)' : 'var(--accent)'),
-                fontFamily: "'DM Mono', monospace",
-                fontSize: '.72rem', letterSpacing: '.1em', textTransform: 'uppercase',
-                cursor: loading ? 'wait' : 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.6rem',
-                transition: 'all .25s', marginBottom: '2rem',
-              }}
-            >
-              {loading ? (
-                <>
-                  <span style={{
-                    width: 12, height: 12, border: '2px solid var(--muted)',
-                    borderTopColor: 'transparent', borderRadius: '50%',
-                    display: 'inline-block', animation: 'spin .7s linear infinite',
-                  }} />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  Send Request
-                </>
-              )}
-            </button>
+            {selected.category === 'AI CHAT' ? (
+              <ChatPanel
+                endpoint={selected}
+                apiBase={API_BASE}
+                getToken={getToken}
+                loggedIn={!!user}
+              />
+            ) : (
+              <>
+                {/* params */}
+                {selected.params.length > 0 && (
+                  <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
+                    {selected.params.map(p => (
+                      <div key={p.name}>
+                        <label style={{
+                          display: 'block', marginBottom: '.35rem',
+                          fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase',
+                          color: 'var(--muted)', fontFamily: "'DM Mono', monospace",
+                        }}>
+                          {p.name}
+                          {p.required && <span style={{ color: '#f87171', marginLeft: '.3rem' }}>*</span>}
+                          {p.description && (
+                            <span style={{ opacity: .6, marginLeft: '.5rem', textTransform: 'none', letterSpacing: 0 }}>
+                              — {p.description}
+                            </span>
+                          )}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder={p.description ?? p.name}
+                          value={values[p.name] ?? ''}
+                          onChange={e => setValues(prev => ({ ...prev, [p.name]: e.target.value }))}
+                          style={{
+                            width: '100%', boxSizing: 'border-box',
+                            background: 'rgba(255,255,255,.04)',
+                            border: '1px solid var(--border)',
+                            padding: '.65rem .85rem',
+                            fontFamily: "'DM Mono', monospace",
+                            fontSize: '.72rem', color: 'var(--text)',
+                            outline: 'none', minHeight: 44,
+                            transition: 'border-color .2s',
+                          }}
+                          onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
+                          onBlur={e  => (e.target.style.borderColor = 'var(--border)')}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-            {/* response */}
-            {response && (
-              <div>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: '.6rem', marginBottom: '.75rem',
-                }}>
-                  <span style={{ fontSize: '.6rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--muted)' }}>Response</span>
-                  <span style={{
-                    fontSize: '.62rem', padding: '.2rem .5rem',
+                {/* send */}
+                <button
+                  onClick={handleSend}
+                  disabled={loading}
+                  style={{
+                    width: '100%', minHeight: 50,
+                    background: loading ? 'var(--surface)' : 'var(--accent)',
+                    color: loading ? 'var(--muted)' : 'var(--bg)',
+                    border: '1px solid ' + (loading ? 'var(--border)' : 'var(--accent)'),
                     fontFamily: "'DM Mono', monospace",
-                    background: ok ? 'rgba(74,222,128,.12)' : 'rgba(239,68,68,.12)',
-                    color:      ok ? '#4ade80' : '#f87171',
-                  }}>
-                    HTTP {status}
-                  </span>
-                </div>
-                <pre style={{
-                  background: 'rgba(0,0,0,.4)', border: '1px solid var(--border)',
-                  padding: '1rem',
-                  fontSize: 'clamp(.62rem, 2vw, .7rem)',
-                  fontFamily: "'DM Mono', monospace",
-                  color: 'var(--text)',
-                  overflowX: 'auto', overflowY: 'auto',
-                  maxHeight: '360px',
-                  whiteSpace: 'pre-wrap', wordBreak: 'break-word',
-                  margin: 0, lineHeight: 1.65,
-                }}>
-                  {response}
-                </pre>
-              </div>
+                    fontSize: '.72rem', letterSpacing: '.1em', textTransform: 'uppercase',
+                    cursor: loading ? 'wait' : 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.6rem',
+                    transition: 'all .25s', marginBottom: '2rem',
+                  }}
+                >
+                  {loading ? (
+                    <>
+                      <span style={{
+                        width: 12, height: 12, border: '2px solid var(--muted)',
+                        borderTopColor: 'transparent', borderRadius: '50%',
+                        display: 'inline-block', animation: 'spin .7s linear infinite',
+                      }} />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      Send Request
+                    </>
+                  )}
+                </button>
+
+                {/* response */}
+                {response && (
+                  <div>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: '.6rem', marginBottom: '.75rem',
+                    }}>
+                      <span style={{ fontSize: '.6rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--muted)' }}>Response</span>
+                      <span style={{
+                        fontSize: '.62rem', padding: '.2rem .5rem',
+                        fontFamily: "'DM Mono', monospace",
+                        background: ok ? 'rgba(74,222,128,.12)' : 'rgba(239,68,68,.12)',
+                        color:      ok ? '#4ade80' : '#f87171',
+                      }}>
+                        HTTP {status}
+                      </span>
+                    </div>
+                    <pre style={{
+                      background: 'rgba(0,0,0,.4)', border: '1px solid var(--border)',
+                      padding: '1rem',
+                      fontSize: 'clamp(.62rem, 2vw, .7rem)',
+                      fontFamily: "'DM Mono', monospace",
+                      color: 'var(--text)',
+                      overflowX: 'auto', overflowY: 'auto',
+                      maxHeight: '360px',
+                      whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                      margin: 0, lineHeight: 1.65,
+                    }}>
+                      {response}
+                    </pre>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
