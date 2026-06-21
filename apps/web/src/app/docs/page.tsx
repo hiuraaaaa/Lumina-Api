@@ -2,34 +2,9 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ENDPOINTS, CATEGORIES } from '@/lib/endpoints'
-import { ProviderIcon } from '@/components/ui/ProviderIcon'
 
-const CAT_ICONS: Record<string, React.ReactNode> = {
-  'AI CHAT': (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-      <path d="M9.5 9h.01M12.5 9h.01M15.5 9h.01" strokeWidth="2" strokeLinecap="round"/>
-    </svg>
-  ),
-  'DOWNLOADER': (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-      <path d="M12 3v13M7 11l5 5 5-5"/><path d="M3 18h18v3H3z"/>
-    </svg>
-  ),
-  'TOOLS': (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-      <rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/>
-    </svg>
-  ),
-  'ANIME': (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-      <circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4V8z"/>
-    </svg>
-  ),
-}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -44,30 +19,12 @@ const stagger = {
 export default function DocsPage() {
   const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.luminaa.web.id'
   const [copied, setCopied] = useState(false)
-  const [activecat, setActivecat] = useState(CATEGORIES[0])
 
   const copy = () => {
     navigator.clipboard.writeText(apiBase)
     setCopied(true)
     setTimeout(() => setCopied(false), 1800)
   }
-
-  // active category on scroll
-  useEffect(() => {
-    const sections = CATEGORIES.map(cat => ({
-      cat,
-      el: document.getElementById(cat.toLowerCase().replace(/\s+/g, '-'))
-    }))
-    const onScroll = () => {
-      const scrollY = window.scrollY + 120
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const { cat, el } = sections[i]
-        if (el && el.offsetTop <= scrollY) { setActivecat(cat); break }
-      }
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
   return (
     <>
@@ -161,21 +118,18 @@ export default function DocsPage() {
             </Link>
 
             <div style={{ fontSize: '.55rem', letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '.75rem', paddingLeft: '.75rem', opacity: .6 }}>
-              Kategori
+              Panduan
             </div>
 
-            {CATEGORIES.map(cat => {
-              const catSlug = cat.toLowerCase().replace(/\s+/g, '-')
-              const count   = ENDPOINTS.filter(e => e.category === cat).length
-              const icon    = CAT_ICONS[cat]
-              return (
-                <a key={cat} href={`#${catSlug}`} className={`sidebar-link ${activecat === cat ? 'active' : ''}`}>
-                  <span style={{ color: 'var(--accent)', opacity: .7, flexShrink: 0 }}>{icon}</span>
-                  <span style={{ flex: 1 }}>{cat}</span>
-                  <span style={{ fontSize: '.55rem', opacity: .5 }}>{count}</span>
-                </a>
-              )
-            })}
+            <a href="#top" className="sidebar-link active">
+              <span style={{ flex: 1 }}>Cara Pakai API Key</span>
+            </a>
+            <Link href="/docs/integration" className="sidebar-link">
+              <span style={{ flex: 1 }}>Panduan Integrasi</span>
+            </Link>
+            <Link href="/models" className="sidebar-link">
+              <span style={{ flex: 1 }}>Semua Endpoint</span>
+            </Link>
 
             <div style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
               <Link href="/playground" style={{
@@ -257,14 +211,6 @@ export default function DocsPage() {
                   </button>
                 </div>
 
-                {/* mobile category jump */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem' }}>
-                  {CATEGORIES.map(cat => (
-                    <a key={cat} href={`#${cat.toLowerCase().replace(/\s+/g, '-')}`} className="cat-jump">
-                      {cat}
-                    </a>
-                  ))}
-                </div>
               </motion.div>
             </div>
 
@@ -320,105 +266,21 @@ export default function DocsPage() {
                     manual kalau manggil dari luar web ini (curl, aplikasi sendiri, bot, dst).
                   </Step>
                 </div>
+
+                <div style={{
+                  display: 'flex', gap: '.8rem', flexWrap: 'wrap', marginTop: '1.6rem',
+                  paddingTop: '1.2rem', borderTop: '1px solid var(--border)',
+                }}>
+                  <Link href="/docs/integration" className="btn-ghost" style={{ fontSize: '.68rem', padding: '.55rem 1rem' }}>
+                    <span>Panduan Integrasi Lengkap →</span>
+                  </Link>
+                  <Link href="/models" className="btn-ghost" style={{ fontSize: '.68rem', padding: '.55rem 1rem' }}>
+                    <span>Lihat Semua Endpoint →</span>
+                  </Link>
+                </div>
               </div>
             </div>
 
-            {/* endpoint sections */}
-            <div style={{ padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2.5rem)' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-                {CATEGORIES.map((cat, ci) => {
-                  const catSlug = cat.toLowerCase().replace(/\s+/g, '-')
-                  const eps     = ENDPOINTS.filter(e => e.category === cat)
-                  return (
-                    <motion.section
-                      key={cat}
-                      id={catSlug}
-                      className="cat-section"
-                      initial={{ opacity: 0, y: 24 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: '-60px' }}
-                      transition={{ duration: .6, delay: ci * .05, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      {/* section header */}
-                      <div style={{
-                        display: 'flex', alignItems: 'center', gap: '.75rem',
-                        marginBottom: '1rem', flexWrap: 'wrap',
-                        paddingBottom: '.75rem', borderBottom: '1px solid var(--border)',
-                      }}>
-                        <span style={{ color: 'var(--accent)' }}>{CAT_ICONS[cat]}</span>
-                        <h2 style={{
-                          fontFamily: "'Syne', sans-serif", fontWeight: 700,
-                          fontSize: 'clamp(.85rem, 2.5vw, 1rem)', letterSpacing: '.06em',
-                          textTransform: 'uppercase',
-                        }}>{cat}</h2>
-                        <span style={{
-                          fontSize: '.58rem', letterSpacing: '.1em', padding: '.2rem .55rem',
-                          background: 'rgba(167,139,250,.08)', border: '1px solid rgba(167,139,250,.18)',
-                          color: 'var(--accent)',
-                        }}>
-                          {eps.length} endpoint{eps.length > 1 ? 's' : ''}
-                        </span>
-                      </div>
-
-                      {/* endpoint list */}
-                      <motion.div
-                        variants={stagger}
-                        initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true, margin: '-40px' }}
-                        style={{ display: 'flex', flexDirection: 'column', gap: 1, background: 'var(--border)' }}
-                      >
-                        {eps.map(ep => (
-                          <motion.div key={ep.slug} variants={fadeUp} transition={{ duration: .45, ease: [0.22,1,0.36,1] }}>
-                            <Link
-                              href={`/docs/${catSlug}/${ep.slug}`}
-                              className="docs-ep-row"
-                              onMouseMove={e => {
-                                const r = e.currentTarget.getBoundingClientRect()
-                                e.currentTarget.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100).toFixed(1)+'%')
-                                e.currentTarget.style.setProperty('--my', ((e.clientY-r.top)/r.height*100).toFixed(1)+'%')
-                              }}
-                            >
-                              <div style={{ minWidth: 0, flex: 1 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.4rem', flexWrap: 'wrap' }}>
-                                  <span className={`method-${ep.method.toLowerCase()}`} style={{
-                                    fontSize: '.58rem', fontFamily: "'DM Mono', monospace",
-                                    fontWeight: 700, padding: '.2rem .5rem', flexShrink: 0,
-                                    letterSpacing: '.06em',
-                                  }}>
-                                    {ep.method}
-                                  </span>
-                                  <code className="ep-path" style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace" }}>
-                                    {ep.path}
-                                  </code>
-                                </div>
-                                <div className="ep-name" style={{
-                                  fontFamily: "'Syne', sans-serif", fontWeight: 600,
-                                  fontSize: '.85rem', color: 'var(--text)',
-                                  transition: 'color .25s', marginBottom: '.2rem',
-                                  display: 'flex', alignItems: 'center', gap: '.4rem',
-                                }}>
-                                  {ep.category === 'AI CHAT' && <ProviderIcon slug={ep.slug} size={15} />}
-                                  {ep.name}
-                                </div>
-                                <div style={{ fontSize: '.68rem', color: 'var(--muted)', lineHeight: 1.6 }}>
-                                  {ep.desc}
-                                </div>
-                              </div>
-                              <div className="ep-arrow">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <path d="M7 17L17 7M17 7H7M17 7v10"/>
-                                </svg>
-                              </div>
-                            </Link>
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    </motion.section>
-                  )
-                })}
-              </div>
-            </div>
           </div>
         </div>
       </main>

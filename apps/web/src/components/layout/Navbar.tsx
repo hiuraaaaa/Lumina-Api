@@ -18,6 +18,7 @@ export default function Navbar() {
         </Link>
         <div className="hidden md:flex items-center gap-6 text-sm text-gray-400">
           <Link href="/docs"       className="hover:text-white transition-colors">Docs</Link>
+          <Link href="/models"     className="hover:text-white transition-colors">Models</Link>
           <Link href="/playground" className="hover:text-white transition-colors">Playground</Link>
           <a href="https://github.com/hiuraaaaa" target="_blank" className="hover:text-white transition-colors">GitHub</a>
           {!loading && user && (
@@ -43,6 +44,7 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden px-4 pb-4 flex flex-col gap-3 text-sm text-gray-400 border-t border-gray-800 pt-4">
           <Link href="/docs"       onClick={() => setOpen(false)}>Docs</Link>
+          <Link href="/models"     onClick={() => setOpen(false)}>Models</Link>
           <Link href="/playground" onClick={() => setOpen(false)}>Playground</Link>
           <a href="https://github.com/hiuraaaaa" target="_blank">GitHub</a>
           {!loading && user && (

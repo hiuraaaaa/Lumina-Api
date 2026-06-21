@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext'
 const NAV_ITEMS = [
   { href: '/dashboard',           label: 'Overview',  icon: 'M3 13h8V3H3v10Zm0 8h8v-6H3v6Zm10 0h8V11h-8v10Zm0-18v6h8V3h-8Z' },
   { href: '/dashboard/keys',      label: 'API Keys',   icon: 'M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777Zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4' },
-  { href: '/dashboard/endpoints', label: 'Endpoints',  icon: 'M4 17V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Zm4-7h8M8 14h5' },
+  { href: '/models',               label: 'Endpoints',  icon: 'M4 17V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Zm4-7h8M8 14h5' },
 ]
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
