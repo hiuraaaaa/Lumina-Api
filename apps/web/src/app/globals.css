@@ -16,6 +16,25 @@
   --muted:   #6b6875;
 }
 
+/* Homepage pakai tema terang+biru, terpisah dari sisa situs (dark+purple).
+   Semua class & inline style lain otomatis ikut palet ini karena CSS
+   custom properties cascade ke turunan .home-light. */
+.home-light {
+  --bg:      #ffffff;
+  --bg2:     #f8fafc;
+  --surface: #f1f5f9;
+  --border:  rgba(15,23,42,0.09);
+  --accent:  #2563eb;
+  --a2:      #3b82f6;
+  --a3:      #0ea5e9;
+  --text:    #0f172a;
+  --muted:   #64748b;
+}
+.home-light .btn-primary { box-shadow: 0 1px 2px rgba(15,23,42,.06); }
+.home-light .btn-primary:hover { color: var(--bg); }
+.home-light .btn-primary::before { background: var(--accent); }
+.home-light ::selection { background: var(--accent); color: #fff; }
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; overflow-x: hidden; }
 

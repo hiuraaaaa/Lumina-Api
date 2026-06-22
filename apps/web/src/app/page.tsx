@@ -134,7 +134,7 @@ export default function HomePage() {
   }
 
   return (
-    <>
+    <div className="home-light">
       <div className="cur" ref={curRef} />
       <div className="cur-ring" ref={ringRef} />
       <div className="prog" ref={progRef} />
@@ -160,7 +160,6 @@ export default function HomePage() {
             {[
               { href: '#cats', label: 'Endpoints' },
               { href: '/docs', label: 'Docs' },
-              { href: '/models', label: 'Models' },
               { href: '/playground', label: 'Playground' },
               ...(!loading && user ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
               ...(!loading && !user ? [{ href: '/login', label: 'Login' }] : []),
@@ -196,7 +195,6 @@ export default function HomePage() {
         <ul className="nav-links">
           <li><a href="#cats">Endpoints</a></li>
           <li><Link href="/docs">Docs</Link></li>
-          <li><Link href="/models">Models</Link></li>
           <li><Link href="/playground">Playground</Link></li>
           {!loading && user && (
             <li style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.66rem', color: 'var(--muted)' }}>
@@ -260,7 +258,7 @@ export default function HomePage() {
               transition={{ duration: 0.7, ease: 'easeOut' }}
             >
               Lumina API — AI Chat, Downloader, Tools, Anime.<br />
-              <b>Tanpa registrasi.</b> Langsung pakai. Gratis selamanya.
+              <b>Login gratis.</b> Buat API key. Gratis selamanya.
             </motion.p>
 
             <motion.div
@@ -434,6 +432,6 @@ export default function HomePage() {
         <span>© 2026 Lumina API — by <a href="https://github.com/hiuraaaaa">Xena</a></span>
         <span>built from termux · shipped on vercel</span>
       </footer>
-    </>
+    </div>
   )
 }
